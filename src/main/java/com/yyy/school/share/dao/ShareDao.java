@@ -196,6 +196,11 @@ public class ShareDao {
 		}
 	}
 
+	public int getCommentNumByTypeAndMid(int type, Integer mid) {
+		String sql = "select count(1) as commentNum from comment where mid = ? and type = ?";
+		return Integer.parseInt(this.jdbcTemplate.queryForMap(sql, mid, type).get("commentNum").toString());
+	}
+
 
 	
 }

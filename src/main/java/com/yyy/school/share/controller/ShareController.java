@@ -202,13 +202,14 @@ public class ShareController {
 	}
 	
 	@RequestMapping(value = "getMessageByMidAndType.do")
-	public ResponseEntity<String> getMessageByMidAndType(Integer type, Integer mid){
+	public ResponseEntity<String> getMessageByMidAndType(Integer type, Integer mid, String nowUid){
 		System.out.println("getMessageByMidAndType type:" + type + " mid:" + mid);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 100);
 		result.put("msg", "查询成功");
-		result.put("result", this.shareService.getMessageByMidAndType(type, mid));
+		result.put("result", this.shareService.getMessageByMidAndType(type, mid, nowUid));
+		result.put("subjects", this.shareService.getComment(type, mid));
 		return jsonEntity(result);
 	}
 	

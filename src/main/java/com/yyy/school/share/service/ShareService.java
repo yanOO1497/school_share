@@ -35,6 +35,7 @@ public class ShareService {
 	public List<Map<String, Object>> loadQuestionList(Integer start, Integer count, String nowUid) {
 		List<Map<String, Object>> list = this.shareDao.loadQuestionList(start, count);
 		for (Map<String, Object> map : list) {
+			map.put("commentNum", this.shareDao.getCommentNumByTypeAndMid(1, (Integer)map.get("id")));
 			String uid = map.get("uid").toString();
 			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(uid);
 			map.put("nickName", userMap.get("nickName").toString());
@@ -97,6 +98,7 @@ public class ShareService {
 		    		}
 		    	}
 		    }
+		    
 		}
 		//举报次数超过20，不显示
 		for (int i = list.size()-1; i >= 0; i--){
@@ -351,8 +353,72 @@ public class ShareService {
 		
 	}
 
-	public Map<String, Object> getMessageByMidAndType(Integer type, Integer mid) {
-		return this.shareDao.getMessageByMidAndType(type, mid);
+	public Map<String, Object> getMessageByMidAndType(Integer type, Integer mid, String nowUid) {
+		Map<String, Object> map = this.shareDao.getMessageByMidAndType(type, mid);
+		map.put("commentNum", this.shareDao.getCommentNumByTypeAndMid(1, (Integer)map.get("id")));
+		String uid = map.get("uid").toString();
+		Map<String, Object> userMap = this.shareDao.getUserInfoByUid(uid);
+		map.put("nickName", userMap.get("nickName").toString());
+		map.put("avatarUrl", userMap.get("avatarUrl").toString());
+		map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+		//统计点赞、踩、收藏、举报人数，并判断当前用户的点赞情况。
+		map.put("agreeFlag", 0);
+		map.put("disagreeFlag", 0);
+		map.put("collectFlag", 0);
+		map.put("reportFlag", 0);
+	    Object agreeStr = map.get("agreeList");
+	    Object disagreeStr = map.get("disagreeList");
+	    Object collectStr = map.get("collectList");
+	    Object reportStr = map.get("reportList");
+	    if(agreeStr == null){
+	    	map.put("agreeNum", 0);
+	    } else {
+	    	List<String> agreeList = Arrays.asList(agreeStr.toString().split(","));
+	    	map.put("agreeNum", agreeList.size());
+	    	for (String str : agreeList) {
+				if (str.equals(nowUid.toString())){
+					map.put("agreeFlag", 1);
+					break;
+				}
+			}
+	    }
+	    if(disagreeStr == null){
+	    	map.put("disagreeNum", 0);
+	    } else {
+	    	List<String> disagreeList = Arrays.asList(disagreeStr.toString().split(","));
+	    	map.put("disagreeNum", disagreeList.size());
+	    	for (String str : disagreeList) {
+	    		if (str.equals(nowUid.toString())){
+	    			map.put("disagreeFlag", 1);
+	    			break;
+	    		}
+	    	}
+	    }
+	    if(collectStr == null){
+	    	map.put("collectNum", 0);
+	    } else {
+	    	List<String> collectList = Arrays.asList(collectStr.toString().split(","));
+	    	map.put("collectNum", collectList.size());
+	    	for (String str : collectList) {
+	    		if (str.equals(nowUid.toString())){
+	    			map.put("collectFlag", 1);
+	    			break;
+	    		}
+	    	}
+	    }
+	    if(reportStr == null){
+	    	map.put("reportNum", 0);
+	    } else {
+	    	List<String> reportList = Arrays.asList(reportStr.toString().split(","));
+	    	map.put("reportNum", reportList.size());
+	    	for (String str : reportList) {
+	    		if (str.equals(nowUid.toString())){
+	    			map.put("reportFlag", 1);
+	    			break;
+	    		}
+	    	}
+	    }
+		return map;
 	}
 		
 	
