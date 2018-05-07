@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -107,6 +108,11 @@
 			<artifactId>qiniu-java-sdk</artifactId>
 			<version>7.1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.2.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -128,7 +134,8 @@
 				<version>9.2.9.v20150224</version>
 				<configuration>
 					<connectors>
-						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+						<connector
+							implementation="org.mortbay.jetty.nio.SelectChannelConnector">
 							<port>8080</port><!--端口号 -->
 						</connector>
 					</connectors>

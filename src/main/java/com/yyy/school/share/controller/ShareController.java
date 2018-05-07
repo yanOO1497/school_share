@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -225,7 +227,7 @@ public class ShareController {
 	public ResponseEntity<String> uploadPic(String uid, HttpServletRequest request) throws Exception{
 		System.out.println("uploadPic call");
 		Long time = System.currentTimeMillis();
-		
+			
 		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 		MultipartFile multipartFile = multipartRequest.getFile("image");
 		String originalFilename = multipartFile.getOriginalFilename();
@@ -234,11 +236,13 @@ public class ShareController {
 		String fileName = uid + "_" + time + type;
 		File convFile = new File(filePath);
 		multipartFile.transferTo(convFile);
+		System.out.println(System.currentTimeMillis() - time);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 100);
 		result.put("msg", "图片上传成功");
 		result.put("result", this.shareService.uploadPic(filePath, fileName));
+		System.out.println(System.currentTimeMillis() - time);
 		return jsonEntity(result);
 	}
 }
