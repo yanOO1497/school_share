@@ -1,16 +1,23 @@
 package com.yyy.school.share.controller;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.sourceforge.htmlunit.corejs.javascript.regexp.SubString;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.yyy.school.share.service.ShareService;
 
@@ -215,13 +222,23 @@ public class ShareController {
 	
 	//TODO
 	@RequestMapping(value = "uploadPic.do")
-	public ResponseEntity<String> uploadPic(){
+	public ResponseEntity<String> uploadPic(String uid, HttpServletRequest request) throws Exception{
 		System.out.println("uploadPic call");
+		Long time = System.currentTimeMillis();
+		
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		MultipartFile multipartFile = multipartRequest.getFile("image");
+		String originalFilename = multipartFile.getOriginalFilename();
+		String type = originalFilename.substring(originalFilename.lastIndexOf("."), originalFilename.length());
+		String filePath = "D:\\image\\" + uid + "_" + time + type;
+		String fileName = uid + "_" + time + type;
+		File convFile = new File(filePath);
+		multipartFile.transferTo(convFile);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
-		this.shareService.uploadPic();
 		result.put("code", 100);
-		result.put("msg", "删除成功");
+		result.put("msg", "图片上传成功");
+		result.put("result", this.shareService.uploadPic(filePath, fileName));
 		return jsonEntity(result);
 	}
 }

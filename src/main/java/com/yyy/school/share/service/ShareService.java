@@ -333,10 +333,10 @@ public class ShareService {
 		return this.shareDao.deleteFromQuestionByMid(mid);
 	}
 
-	public String uploadPic() {
+	public String uploadPic(String filePath, String fileName) {
 		 QiniuUtil qiniuUtil = new QiniuUtil();
-		 String filePath = "D:/yyy/123.jpg";
-		 String fileName = System.currentTimeMillis() + ".jpg";
+//		 String filePath = "D:/yyy/123.jpg";
+//		 String fileName = uid + "_" + System.currentTimeMillis() + ".jpg";
 		 String picUrl = "http://p8aftlhm5.bkt.clouddn.com/" + fileName;  //拼接picUrl
          try {
              //上传到七牛云
