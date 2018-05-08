@@ -2,6 +2,7 @@ package com.yyy.school.share.controller;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -64,21 +63,22 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
-	@RequestMapping(value = "addToQuestion.do")
-	public ResponseEntity<String> addToQuestion(String content,  @RequestParam(value = "picUrl", defaultValue = "")String picUrl, String uid){
-		System.out.println("addToQuestion call");
-		
-		int i = this.shareService.addToQuestion(content, picUrl, uid);
-		Map<String, Object> result = new HashMap<String, Object>();
-		if(i != 1){
-			result.put("code", 99);
-			result.put("msg", "创建失败");
-			return jsonEntity(result);
-		}
-		result.put("code", 100);
-		result.put("msg", "创建成功");
-		return jsonEntity(result);
-	}
+	//全部发布使用同一个接口
+//	@RequestMapping(value = "addToQuestion.do")
+//	public ResponseEntity<String> addToQuestion(String content,  @RequestParam(value = "picUrl", defaultValue = "")String picUrl, String uid){
+//		System.out.println("addToQuestion call");
+//		
+//		int i = this.shareService.addToQuestion(content, picUrl, uid);
+//		Map<String, Object> result = new HashMap<String, Object>();
+//		if(i != 1){
+//			result.put("code", 99);
+//			result.put("msg", "创建失败");
+//			return jsonEntity(result);
+//		}
+//		result.put("code", 100);
+//		result.put("msg", "创建成功");
+//		return jsonEntity(result);
+//	}
 	
 	@RequestMapping(value = "loadQuestionList.do")
 	public ResponseEntity<String> loadQuestionList(Integer start, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
@@ -222,27 +222,44 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
-	//TODO
 	@RequestMapping(value = "uploadPic.do")
-	public ResponseEntity<String> uploadPic(String uid, HttpServletRequest request) throws Exception{
+	public ResponseEntity<String> uploadPic(String uid, HttpServletRequest request, Integer type) throws Exception{
 		System.out.println("uploadPic call");
 		Long time = System.currentTimeMillis();
-			
+		
 		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 		MultipartFile multipartFile = multipartRequest.getFile("image");
 		String originalFilename = multipartFile.getOriginalFilename();
-		String type = originalFilename.substring(originalFilename.lastIndexOf("."), originalFilename.length());
-		String filePath = "D:\\image\\" + uid + "_" + time + type;
-		String fileName = uid + "_" + time + type;
+		String fileType = originalFilename.substring(originalFilename.lastIndexOf("."), originalFilename.length());
+		String filePath = "D:\\image\\" + uid + "_" + time + fileType;
+		String fileName = type + "_" + uid + "_" + time + fileType;
 		File convFile = new File(filePath);
 		multipartFile.transferTo(convFile);
-		System.out.println(System.currentTimeMillis() - time);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 100);
 		result.put("msg", "图片上传成功");
-		result.put("result", this.shareService.uploadPic(filePath, fileName));
-		System.out.println(System.currentTimeMillis() - time);
+		result.put("picUrl", this.shareService.uploadPic(filePath, fileName));
 		return jsonEntity(result);
 	}
+	
+	@RequestMapping(value = "publish.do")
+	public ResponseEntity<String> publish(String uid, @RequestParam(value = "successUrl", defaultValue = "")String[] successUrl, 
+			@RequestParam(value = "cancelUrl", defaultValue = "")String[] cancelUrl, Integer type, String content, 
+			@RequestParam(value = "reward", defaultValue = "")String reward) throws IOException {
+		System.out.println("publish call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		int i = this.shareService.publish(uid, successUrl, cancelUrl, type, content, reward);
+		if (i != 1){
+			result.put("code", 99);
+			result.put("msg", "发布失败");
+			return jsonEntity(result);
+		} else {
+			result.put("code", 100);
+			result.put("msg", "发布成功");
+			return jsonEntity(result);
+		}
+	}
+	
 }

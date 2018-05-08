@@ -142,10 +142,10 @@ public class ShareDao {
 		return this.jdbcTemplate.update(sql, bio, uid);
 	}
 
-	public int addToQuestion(String content, String picUrl, String uid) {
-		String sql = "insert into question (uid, content, picUrl, createTimeStamp) values(?,?,?,?)";
-		return this.jdbcTemplate.update(sql, uid, content, picUrl, System.currentTimeMillis());
-	}
+//	public int addToQuestion(String content, String picUrl, String uid) {
+//		String sql = "insert into question (uid, content, picUrl, createTimeStamp) values(?,?,?,?)";
+//		return this.jdbcTemplate.update(sql, uid, content, picUrl, System.currentTimeMillis());
+//	}
 
 	public int addToComment(String uid, Integer type, Integer mid,
 			String content, String fatherId) {
@@ -199,6 +199,15 @@ public class ShareDao {
 	public int getCommentNumByTypeAndMid(int type, Integer mid) {
 		String sql = "select count(1) as commentNum from comment where mid = ? and type = ?";
 		return Integer.parseInt(this.jdbcTemplate.queryForMap(sql, mid, type).get("commentNum").toString());
+	}
+
+	public int publish(Integer type, String content, String picUrl, String uid, String reward) {
+		if (type == 1){
+			String sql = "insert into question (uid, content, picUrl, createTimeStamp) values(?,?,?,?)";
+			return this.jdbcTemplate.update(sql, uid, content, picUrl, System.currentTimeMillis());
+		} else {
+			return 0;
+		}
 	}
 
 

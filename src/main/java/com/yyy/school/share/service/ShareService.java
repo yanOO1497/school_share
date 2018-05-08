@@ -1,5 +1,6 @@
 package com.yyy.school.share.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class ShareService {
 
 	@Autowired
 	private ShareDao shareDao;
+	
+	public static QiniuUtil qiniuUtil = new QiniuUtil();
 	
 	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -237,9 +240,9 @@ public class ShareService {
 		return this.shareDao.setBioByUid(bio, uid);
 	}
 
-	public int addToQuestion(String content, String picUrl, String uid) {
-		return this.shareDao.addToQuestion(content, picUrl, uid);
-	}
+//	public int addToQuestion(String content, String picUrl, String uid) {
+//		return this.shareDao.addToQuestion(content, picUrl, uid);
+//	}
 
 	public int addToComment(String uid, Integer type, Integer mid,
 			String content, String fatherId) {
@@ -334,16 +337,16 @@ public class ShareService {
 	}
 
 	public String uploadPic(String filePath, String fileName) {
-		 QiniuUtil qiniuUtil = new QiniuUtil();
-//		 String filePath = "D:/yyy/123.jpg";
-//		 String fileName = uid + "_" + System.currentTimeMillis() + ".jpg";
+		
 		 String picUrl = "http://p8aftlhm5.bkt.clouddn.com/" + fileName;  //拼接picUrl
          try {
              //上传到七牛云
              qiniuUtil.upload(filePath, fileName);
          } catch (IOException e) {
-             // TODO Auto-generated catch block
              e.printStackTrace();
+         } finally {
+        	 File deleteFile = new File(filePath); //删除本地副本
+             deleteFile.delete();
          }
          return picUrl;
 	}
@@ -419,6 +422,18 @@ public class ShareService {
 	    	}
 	    }
 		return map;
+	}
+
+	//TODO thread?
+	public int publish(String uid, String[] successUrl, String[] cancelUrl,
+			Integer type, String content, String reward) throws IOException {
+		for(int i = 0; i < cancelUrl.length; i++){
+			System.out.println(successUrl[i]);
+			String cancelStr = successUrl[i].replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
+			qiniuUtil.delete(cancelStr);
+		}
+		String picUrl = successUrl.toString().replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(" ", "");
+		return this.shareDao.publish(type, content, picUrl, uid, reward);
 	}
 		
 	
