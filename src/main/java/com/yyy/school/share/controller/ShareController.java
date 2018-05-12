@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -80,16 +81,79 @@ public class ShareController {
 //		return jsonEntity(result);
 //	}
 	
-	@RequestMapping(value = "loadQuestionList.do")
-	public ResponseEntity<String> loadQuestionList(Integer start, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
-			System.out.println("loadQuestionList call");
+//	@RequestMapping(value = "loadQuestionList.do")
+//	public ResponseEntity<String> loadQuestionList(Integer start, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+//			System.out.println("loadQuestionList call");
+//
+//			Map<String, Object> result = new HashMap<String, Object>();
+//			result.put("code", 100);
+//			result.put("msg", "查询成功");
+//			result.put("type", "question");
+//			result.put("nowUid", nowUid);
+//			result.put("subjects", this.shareService.loadQuestionList(start, count, nowUid));
+//			return jsonEntity(result);
+//	}
+	
+//	@RequestMapping(value = "loadExperienceList.do")
+//	public ResponseEntity<String> loadExperienceList(Integer start, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+//			System.out.println("loadExperienceList call");
+//
+//			Map<String, Object> result = new HashMap<String, Object>();
+//			result.put("code", 100);
+//			result.put("msg", "查询成功");
+//			result.put("type", "question");
+//			result.put("nowUid", nowUid);
+//			result.put("subjects", this.shareService.loadExperienceList(start, count, nowUid));
+//			return jsonEntity(result);
+//	}
+//	@RequestMapping(value = "loadActivityList.do")
+//	public ResponseEntity<String> loadActivityList(Integer start, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+//			System.out.println("loadActivityList call");
+//
+//			Map<String, Object> result = new HashMap<String, Object>();
+//			result.put("code", 100);
+//			result.put("msg", "查询成功");
+//			result.put("type", "question");
+//			result.put("nowUid", nowUid);
+//			result.put("subjects", this.shareService.loadActivityList(start, count, nowUid));
+//			return jsonEntity(result);
+//	}
+//	@RequestMapping(value = "loadMarketList.do")
+//	public ResponseEntity<String> loadMarketList(Integer start, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+//			System.out.println("loadMarketList call");
+//
+//			Map<String, Object> result = new HashMap<String, Object>();
+//			result.put("code", 100);
+//			result.put("msg", "查询成功");
+//			result.put("type", "question");
+//			result.put("nowUid", nowUid);
+//			result.put("subjects", this.shareService.loadMarketList(start, count, nowUid));
+//			return jsonEntity(result);
+//	}
+//	
+//	@RequestMapping(value = "loadRewardHelpList.do")
+//	public ResponseEntity<String> loadRewardHelpList(Integer start, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+//			System.out.println("loadRewardHelpList call");
+//
+//			Map<String, Object> result = new HashMap<String, Object>();
+//			result.put("code", 100);
+//			result.put("msg", "查询成功");
+//			result.put("type", "question");
+//			result.put("nowUid", nowUid);
+//			result.put("subjects", this.shareService.loadRewardHelpList(start, count, nowUid));
+//			return jsonEntity(result);
+//	}
+	
+	@RequestMapping(value = "loadTableList.do")
+	public ResponseEntity<String> loadTableList(Integer start, Integer tableType, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+			System.out.println("loadTableList call");
 
 			Map<String, Object> result = new HashMap<String, Object>();
 			result.put("code", 100);
 			result.put("msg", "查询成功");
 			result.put("type", "question");
 			result.put("nowUid", nowUid);
-			result.put("subjects", this.shareService.loadQuestionList(start, count, nowUid));
+			result.put("subjects", this.shareService.loadTableList(start, count, nowUid,tableType));
 			return jsonEntity(result);
 	}
 	
@@ -184,6 +248,18 @@ public class ShareController {
 			return jsonEntity(result);
 	}
 	
+	public ResponseEntity<String> getExperienceListByUid(Integer start, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+		System.out.println("getExperienceListByUid call");
+
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "查询成功");
+		result.put("type", "question");
+		result.put("nowUid", nowUid);
+		result.put("subjects", this.shareService.getExperienceListByUid(start, count, nowUid));
+		return jsonEntity(result);
+}
+	
 	@RequestMapping(value = "deleteFromQuestionByMid.do")
 	public ResponseEntity<String> deleteFromQuestionByMid(Integer mid){
 		System.out.println("deleteFromQuestionByMid call");
@@ -222,12 +298,18 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
-	@RequestMapping(value = "uploadPic.do")
-	public ResponseEntity<String> uploadPic(String uid, HttpServletRequest request, Integer type) throws Exception{
-		System.out.println("uploadPic call");
+	@RequestMapping(value = "uploadPic.do", method = RequestMethod.POST)
+	public ResponseEntity<String> uploadPic(HttpServletRequest request) throws Exception{
+		System.out.println("uploadPic call" );
 		Long time = System.currentTimeMillis();
 		
+//		String uid = request.getParameter("uid");
+//		Integer type = 1;
+		
 		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		String uid = multipartRequest.getParameter("uid");
+		Integer type = 1;
+		System.out.println("uploadPic call" + uid + " " );
 		MultipartFile multipartFile = multipartRequest.getFile("image");
 		String originalFilename = multipartFile.getOriginalFilename();
 		String fileType = originalFilename.substring(originalFilename.lastIndexOf("."), originalFilename.length());
@@ -244,13 +326,14 @@ public class ShareController {
 	}
 	
 	@RequestMapping(value = "publish.do")
-	public ResponseEntity<String> publish(String uid, @RequestParam(value = "successUrl", defaultValue = "")String[] successUrl, 
+	public ResponseEntity<String> publish(String uid,String[] successUrl, 
 			@RequestParam(value = "cancelUrl", defaultValue = "")String[] cancelUrl, Integer type, String content, 
-			@RequestParam(value = "reward", defaultValue = "")String reward) throws IOException {
+			@RequestParam(value = "reward", defaultValue = "")String reward, Integer flag) throws IOException {
 		System.out.println("publish call");
 		
+		
 		Map<String, Object> result = new HashMap<String, Object>();
-		int i = this.shareService.publish(uid, successUrl, cancelUrl, type, content, reward);
+		int i = this.shareService.publish(uid, successUrl, cancelUrl, type, content, reward, flag);
 		if (i != 1){
 			result.put("code", 99);
 			result.put("msg", "发布失败");
