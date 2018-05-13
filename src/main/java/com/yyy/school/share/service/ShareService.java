@@ -397,9 +397,17 @@ public class ShareService {
 	public int sentMessage(String uid, String content, String nowUid) {
 		
 		
-		
-		
 		return 0;
+	}
+
+	public List<Map<String, Object>> loadBookList(Integer start, Integer count, Integer bookType) {
+		List<Map<String, Object>> list = this.shareDao.loadBookList(start, count ,bookType);
+		for (Map<String, Object> map : list) {
+			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+			map.put("nickName", userMap.get("nickName").toString());
+			map.put("avatarUrl", userMap.get("avatarUrl").toString());
+		}
+		return list;
 	}
 
 //	public Object loadExperienceList(Integer start, Integer count, String nowUid) {

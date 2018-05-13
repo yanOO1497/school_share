@@ -196,6 +196,13 @@ public class ShareDao {
 		return this.jdbcTemplate.queryForList(sql, start, count);
 	}
 
+
+	public List<Map<String, Object>> loadBookList(Integer start, Integer count, Integer bookType) {
+		
+		String sql = "select * from books where type = ? order by createTimeStamp desc limit ?,?";
+		return this.jdbcTemplate.queryForList(sql, bookType , start, count);
+	}
+
 	
 	
 }
