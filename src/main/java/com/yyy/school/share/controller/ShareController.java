@@ -180,14 +180,14 @@ public class ShareController {
 	}
 	
 
-	@RequestMapping(value = "setDisagree.do")
-	public ResponseEntity<String> setDisagree(String uid, Integer type, Integer mid, Integer disagreeFlag){
-		System.out.println("setDisagree call");
+	@RequestMapping(value = "setShare.do")
+	public ResponseEntity<String> setShare(String uid, Integer type, Integer mid){
+		System.out.println("setShare call");
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 100);
 		result.put("msg", "修改成功");
-		result.put("result", this.shareService.setDisagree(uid, type, mid, disagreeFlag));
+		result.put("result", this.shareService.setShare(uid, type, mid));
 		return jsonEntity(result);
 	}
 	
@@ -334,6 +334,23 @@ public class ShareController {
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		int i = this.shareService.publish(uid, successUrl, cancelUrl, type, content, reward, flag);
+		if (i != 1){
+			result.put("code", 99);
+			result.put("msg", "发布失败");
+			return jsonEntity(result);
+		} else {
+			result.put("code", 100);
+			result.put("msg", "发布成功");
+			return jsonEntity(result);
+		}
+	}
+	@RequestMapping(value = "sentMessage.do")
+	public ResponseEntity<String> sentMessage(String uid, String content, String nowUid) throws IOException {
+		System.out.println("publish call");
+		
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		int i = this.shareService.sentMessage(uid, content,  nowUid);
 		if (i != 1){
 			result.put("code", 99);
 			result.put("msg", "发布失败");

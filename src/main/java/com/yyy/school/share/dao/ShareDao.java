@@ -60,9 +60,9 @@ public class ShareDao {
 		return this.jdbcTemplate.queryForList(sql, mid);
 	}
 	
-	public List<Map<String, Object>> getDisagree(Integer type, Integer mid) {
+	public List<Map<String, Object>> getShareNum(Integer type, Integer mid) {
 		String tableName =this.getTableNameByType(type);
-		String sql = "select disagreeList from " + tableName + " where id = ?";
+		String sql = "select shareList from " + tableName + " where id = ?";
 		return this.jdbcTemplate.queryForList(sql, mid);
 	}
 	
@@ -82,14 +82,12 @@ public class ShareDao {
 		String tableName =this.getTableNameByType(type);
 		String sql = "update " + tableName + " set agreeList = ? where id = ?";
 		this.jdbcTemplate.update(sql, agreeStr, mid);
-		
 	}
 	
-	public void setDisagree(Integer type, Integer mid, String disagreeStr) {
+	public void setShare(Integer type, Integer mid, String shareArr) {
 		String tableName =this.getTableNameByType(type);
-		String sql = "update " + tableName + " set disagreeList = ? where id = ?";
-		this.jdbcTemplate.update(sql, disagreeStr, mid);
-		
+		String sql = "update " + tableName + " set shareList = ? where id = ?";
+		this.jdbcTemplate.update(sql, shareArr, mid);	
 	}
 	
 	public void setCollect(Integer type, Integer mid, String collectStr) {
@@ -177,39 +175,20 @@ public class ShareDao {
 	}
 
 	public int publish(Integer type, String content, String picUrl, String uid, String reward) {
-		
-		if (type == 1){
-			String sql = "insert into question (uid, content, picUrl, createTimeStamp) values(?,?,?,?)";
+		String tableName = this.getTableNameByType(type);
+		String sql = "";
+		if(type == 3) {
+			sql = "insert into "+ tableName +" (uid, content, picUrl, createTimeStamp,reward) values(?,?,?,?,?)";
+			return this.jdbcTemplate.update(sql, uid, content, picUrl, System.currentTimeMillis(),reward);
+		}else {
+			sql = "insert into "+ tableName +" (uid, content, picUrl, createTimeStamp) values(?,?,?,?)";
 			return this.jdbcTemplate.update(sql, uid, content, picUrl, System.currentTimeMillis());
-		} else {
-			return 0;
 		}
 	}
-
 	public List<Map<String, Object>> getExperienceListByUid(Integer start, Integer count, String nowUid) {
 		String sql = "select * from expericenceshare where uid = ? order by createTimeStamp desc limit ?,?";
 		return this.jdbcTemplate.queryForList(sql, nowUid, start, count);
 	}
-
-//	public List<Map<String, Object>> loadExperienceList(Integer start, Integer count) {
-//		String sql = "select * from experienceshare order by createTimeStamp desc limit ?,?";
-//		return this.jdbcTemplate.queryForList(sql, start, count);
-//	}
-
-//	public List<Map<String, Object>> loadActivityList(Integer start, Integer count) {
-//		String sql = "select * from schoolactivity order by createTimeStamp desc limit ?,?";
-//		return this.jdbcTemplate.queryForList(sql, start, count);
-//	}
-//
-//	public List<Map<String, Object>> loadMarketList(Integer start, Integer count) {
-//		String sql = "select * from secondmarket order by createTimeStamp desc limit ?,?";
-//		return this.jdbcTemplate.queryForList(sql, start, count);
-//	}
-//
-//	public List<Map<String, Object>> loadRewardHelpList(Integer start, Integer count) {
-//		String sql = "select * from rewardhelp order by createTimeStamp desc limit ?,?";
-//		return this.jdbcTemplate.queryForList(sql, start, count);
-//	}
 
 	public List<Map<String, Object>> loadTableList(Integer start, Integer count, Integer tableType) {
 		String tableName = this.getTableNameByType(tableType);
