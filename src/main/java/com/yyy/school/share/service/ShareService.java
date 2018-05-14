@@ -377,15 +377,25 @@ public class ShareService {
 	//TODO thread?
 	public int publish(String uid, String[] successUrl, String[] cancelUrl,
 			Integer type, String content, String reward, Integer flag) throws IOException {
-		for(int i = 0; i < cancelUrl.length; i++){
-			String cancelStr = cancelUrl[i].replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
-			qiniuUtil.delete(cancelStr);
+		
+		if(cancelUrl != null) {
+			for(int i = 0; i < cancelUrl.length; i++){
+				String cancelStr = cancelUrl[i].replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
+				qiniuUtil.delete(cancelStr);
+			}
+			if (flag == 0) {
+				return 0;
+			}
 		}
-		if (flag == 0) {
-			return 0;
+		String picUrl = "";
+		if(successUrl != null) {
+			picUrl = StringUtils.join(successUrl, ",").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
+			
 		}
-		String picUrl = StringUtils.join(successUrl, ",").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
+		
 		return this.shareDao.publish(type, content, picUrl, uid, reward);
+		
+		
 	}
 
 	public Object getExperienceListByUid(Integer start, Integer count, String nowUid) {

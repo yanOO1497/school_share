@@ -337,8 +337,7 @@ public class ShareController {
 	}
 	
 	@RequestMapping(value = "publish.do")
-	public ResponseEntity<String> publish(String uid,String[] successUrl, 
-			@RequestParam(value = "cancelUrl", defaultValue = "")String[] cancelUrl, Integer type, String content, 
+	public ResponseEntity<String> publish(String uid,String[] successUrl,String[] cancelUrl, Integer type, String content, 
 			@RequestParam(value = "reward", defaultValue = "")String reward, Integer flag) throws IOException {
 		System.out.println("publish call");
 		
