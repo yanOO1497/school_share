@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -99,6 +98,16 @@
 			<version>4.3.6.RELEASE</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>4.3.6.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>4.3.6.RELEASE</version>
+		</dependency>
+		<dependency>
 			<groupId>jstl</groupId>
 			<artifactId>jstl</artifactId>
 			<version>1.1.2</version>
@@ -134,8 +143,7 @@
 				<version>9.2.9.v20150224</version>
 				<configuration>
 					<connectors>
-						<connector
-							implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
 							<port>8080</port><!--端口号 -->
 						</connector>
 					</connectors>
