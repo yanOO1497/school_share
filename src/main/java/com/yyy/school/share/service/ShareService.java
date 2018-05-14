@@ -406,6 +406,7 @@ public class ShareService {
 			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
 			map.put("nickName", userMap.get("nickName").toString());
 			map.put("avatarUrl", userMap.get("avatarUrl").toString());
+			map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
 		}
 		return list;
 	}

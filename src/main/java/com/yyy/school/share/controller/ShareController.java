@@ -1,8 +1,11 @@
 package com.yyy.school.share.controller;
 
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -313,13 +316,10 @@ public class ShareController {
 	public ResponseEntity<String> uploadPic(HttpServletRequest request) throws Exception{
 		System.out.println("uploadPic call" );
 		Long time = System.currentTimeMillis();
-		
-//		String uid = request.getParameter("uid");
-//		Integer type = 1;
+		String uid = request.getParameter("uid");
+		Integer type = Integer.parseInt(request.getParameter("type"));
 		
 		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-		String uid = multipartRequest.getParameter("uid");
-		Integer type = 1;
 		System.out.println("uploadPic call" + uid + " " );
 		MultipartFile multipartFile = multipartRequest.getFile("image");
 		String originalFilename = multipartFile.getOriginalFilename();
