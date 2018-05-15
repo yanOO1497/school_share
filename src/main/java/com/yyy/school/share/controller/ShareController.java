@@ -171,6 +171,17 @@ public class ShareController {
 			return jsonEntity(result);
 	}
 	
+	@RequestMapping(value = "searchCoursewareList.do")
+	public ResponseEntity<String> searchCoursewareList(Integer start, Integer count,@RequestParam(value = "searchName", defaultValue = "") String searchName){
+			System.out.println("searchCoursewareList call");
+
+			Map<String, Object> result = new HashMap<String, Object>();
+			result.put("code", 100);
+			result.put("msg", "查询成功");
+			result.put("subjects", this.shareService.searchCoursewareList(start, count,searchName));
+			return jsonEntity(result);
+	}
+	
 	@RequestMapping(value = "loadUserInfoDetails.do")
 	public ResponseEntity<String> loadUserInfoDetails(String uid){
 		System.out.println("loadUserInfoDetails call");

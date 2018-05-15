@@ -421,6 +421,18 @@ public class ShareService {
 		return list;
 	}
 
+	public List<Map<String, Object>> searchCoursewareList(Integer start, Integer count,  String searchName) {
+		// TODO Auto-generated method stub
+		List<Map<String, Object>> list = this.shareDao.searchCoursewareList(start, count ,searchName);
+		for (Map<String, Object> map : list) {
+			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+			map.put("nickName", userMap.get("nickName").toString());
+			map.put("avatarUrl", userMap.get("avatarUrl").toString());
+			map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+		}
+		return list;
+	}
+
 //	public Object loadExperienceList(Integer start, Integer count, String nowUid) {
 //		List<Map<String, Object>> list = this.shareDao.loadExperienceList(start, count);
 //		

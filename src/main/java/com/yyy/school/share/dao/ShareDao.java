@@ -203,6 +203,18 @@ public class ShareDao {
 		return this.jdbcTemplate.queryForList(sql, bookType , start, count);
 	}
 
+
+	public List<Map<String, Object>> searchCoursewareList(Integer start, Integer count, String searchName) {
+		String sql;
+		if (searchName.equals("")) {
+			sql = "select * from courseware order by createTimeStamp desc limit ?,?";
+		} else {
+			sql = "select * from courseware where courseName like '%" + searchName + "%'  order by createTimeStamp desc limit ?,?";
+		}
+		return this.jdbcTemplate.queryForList(sql , start, count);
+		
+	}
+
 	
 	
 }
