@@ -74,32 +74,32 @@ public class ShareDao {
 	
 	public List<Map<String, Object>> getReport(Integer type, Integer mid) {
 		String tableName =this.getTableNameByType(type);
-		String sql = "select reportList from " + tableName + " where id = ?";
+		String sql = "select reportList from " + tableName + "  where id = ?";
 		return this.jdbcTemplate.queryForList(sql, mid);
 	}
 
 	public void setAgree(Integer type, Integer mid, String agreeStr) {
 		String tableName =this.getTableNameByType(type);
-		String sql = "update " + tableName + " set agreeList = ? where id = ?";
+		String sql = "update " + tableName + " set agreeList = ? and score = score + 1 where id = ?";
 		this.jdbcTemplate.update(sql, agreeStr, mid);
 	}
 	
 	public void setShare(Integer type, Integer mid, String shareArr) {
 		String tableName =this.getTableNameByType(type);
-		String sql = "update " + tableName + " set shareList = ? where id = ?";
+		String sql = "update " + tableName + " set shareList = ? and score = score + 2 where id = ?";
 		this.jdbcTemplate.update(sql, shareArr, mid);	
 	}
 	
 	public void setCollect(Integer type, Integer mid, String collectStr) {
 		String tableName = this.getTableNameByType(type);
-		String sql = "update " + tableName + " set collectList = ? where id = ?";
+		String sql = "update " + tableName + " set collectList = ? and score = score + 2 where id = ?";
 		this.jdbcTemplate.update(sql, collectStr, mid);
 		
 	}
 	
 	public void setReport(Integer type, Integer mid, String reportStr) {
 		String tableName = this.getTableNameByType(type);
-		String sql = "update " + tableName + " set reportList = ? where id = ?";
+		String sql = "update " + tableName + " set reportList = ?  and score = score - 3  where id = ?";
 		this.jdbcTemplate.update(sql, reportStr, mid);
 		
 	}
@@ -114,7 +114,10 @@ public class ShareDao {
 		return this.jdbcTemplate.update(sql, uid, nickName, avatarUrl, school, System.currentTimeMillis(), sex);
 		
 	}
-
+	
+	
+	
+	
 	public int setBioByUid(String bio, String uid) {
 		String sql = "update user set bio = ? where id = ?";
 		return this.jdbcTemplate.update(sql, bio, uid);
@@ -197,9 +200,14 @@ public class ShareDao {
 	}
 
 
-	public List<Map<String, Object>> loadBookList(Integer start, Integer count, Integer bookType) {
+	public List<Map<String, Object>> loadBookList(Integer start, Integer count, Integer bookType , String searchName) {
+		String sql;
+		if (searchName.equals("")) {
+			sql = "select * from books where type = ? order by createTimeStamp desc limit ?,?";
+		} else {
+			sql = "select * from books where bookName like '%" + searchName + "%' and type = ? order by createTimeStamp desc limit ?,?";
+		}
 		
-		String sql = "select * from books where type = ? order by createTimeStamp desc limit ?,?";
 		return this.jdbcTemplate.queryForList(sql, bookType , start, count);
 	}
 
@@ -213,6 +221,17 @@ public class ShareDao {
 		}
 		return this.jdbcTemplate.queryForList(sql , start, count);
 		
+	}
+
+
+	public List<Map<String, Object>> loadQuesAndShareList(Integer start, Integer count, String searchName) {
+		String sql;
+		if (searchName.equals("")) {
+			sql = "select * from question where score > 4  union select * from experienceshare where score > 4  order by createTimeStamp desc limit ?,?";
+		} else {
+			sql = "select * from experienceshare where content like '%" + searchName + "%' and score > 4  union select * from experienceshare where content like '%" + searchName + "%' and score > 4  order by createTimeStamp desc limit ?,?";
+		}
+		return this.jdbcTemplate.queryForList(sql , start, count);
 	}
 
 	

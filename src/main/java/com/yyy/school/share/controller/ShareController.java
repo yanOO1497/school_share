@@ -36,7 +36,7 @@ public class ShareController {
 	private ShareService shareService;
 	
 	@RequestMapping(value = "saveUserInfo.do")
-	public ResponseEntity<String> saveUserInfo(String uid, String nickName, String avatarUrl, String school, Integer sex){
+	public ResponseEntity<String> saveUserInfo(String uid, String nickName, String avatarUrl, @RequestParam(value = "school", defaultValue = "")String school, Integer sex){
 		System.out.println("saveUserInfo call");
 		
 		int i = this.shareService.saveUserInfo(uid, nickName, avatarUrl, school, sex);
@@ -161,13 +161,24 @@ public class ShareController {
 	}
 	
 	@RequestMapping(value = "loadBookList.do")
-	public ResponseEntity<String> loadBookList(Integer start, Integer bookType, Integer count){
+	public ResponseEntity<String> loadBookList(Integer start, Integer bookType, Integer count ,@RequestParam(value = "searchName", defaultValue = "") String searchName){
 			System.out.println("loadBookList call");
 
 			Map<String, Object> result = new HashMap<String, Object>();
 			result.put("code", 100);
 			result.put("msg", "查询成功");
-			result.put("subjects", this.shareService.loadBookList(start, count, bookType));
+			result.put("subjects", this.shareService.loadBookList(start, count, bookType ,searchName));
+			return jsonEntity(result);
+	}
+	
+	@RequestMapping(value = "loadQuesAndShareList.do")
+	public ResponseEntity<String> loadQuesAndShareList(Integer start, Integer count ,@RequestParam(value = "searchName", defaultValue = "") String searchName,@RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+			System.out.println("loadQuesAndShareList call");
+
+			Map<String, Object> result = new HashMap<String, Object>();
+			result.put("code", 100);
+			result.put("msg", "查询成功");
+			result.put("subjects", this.shareService.loadQuesAndShareList(start, count, searchName , nowUid));
 			return jsonEntity(result);
 	}
 	

@@ -45,11 +45,11 @@ public class ShareService {
 	
 	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	// 处理获取信息列表的点赞等信息
-	 public List<Map<String, Object>> getMoreListDetail (List<Map<String, Object>> list,String nowUid,Integer type) {
+	 public List<Map<String, Object>> getMoreListDetail (List<Map<String, Object>> list,String nowUid) {
 	    	for (Map<String, Object> map : list) {
 				String uid = map.get("uid").toString();
 				Integer mid = (Integer)map.get("mid");
-//				List<Map<String, Object>> comList = this.getComment(type, mid);
+				Integer type =  (Integer)map.get("type");
 				map.put("commentNum", this.shareDao.getCommentNumByTypeAndMid(type, (Integer)map.get("id")));
 				Map<String, Object> userMap = this.shareDao.getUserInfoByUid(uid);
 				map.put("nickName", userMap.get("nickName").toString());
@@ -125,7 +125,7 @@ public class ShareService {
 	public List<Map<String, Object>> loadTableList(Integer start, Integer count, String nowUid,Integer tableType) {
 		List<Map<String, Object>> list = this.shareDao.loadTableList(start, count ,tableType);
 		
-		list = this.getMoreListDetail(list, nowUid,tableType);
+		list = this.getMoreListDetail(list, nowUid);
 		//举报次数超过20，不显示
 		for (int i = list.size()-1; i >= 0; i--){
 			if ((Integer)list.get(i).get("reportNum") >= 20){
@@ -278,7 +278,7 @@ public class ShareService {
     public List<Map<String, Object>> getQuestionListByUid(Integer start, Integer count,
 			String nowUid) {
 		List<Map<String, Object>> list = this.shareDao.getQuestionListByUid(start, count, nowUid);
-		list = this.getMoreListDetail(list, nowUid,1);
+		list = this.getMoreListDetail(list, nowUid);
 		return list;
 	}
 
@@ -314,13 +314,13 @@ public class ShareService {
 		map.put("nickName", userMap.get("nickName").toString());
 		map.put("avatarUrl", userMap.get("avatarUrl").toString());
 		map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
-		//统计点赞、踩、收藏、举报人数，并判断当前用户的点赞情况。
+		//统计点赞、分享、收藏、举报人数，并判断当前用户的点赞情况。
 		map.put("agreeFlag", 0);
-		map.put("disagreeFlag", 0);
+		map.put("shareFlag", 0);
 		map.put("collectFlag", 0);
 		map.put("reportFlag", 0);
 	    Object agreeStr = map.get("agreeList");
-	    Object disagreeStr = map.get("disagreeList");
+	    Object shareStr = map.get("shareList");
 	    Object collectStr = map.get("collectList");
 	    Object reportStr = map.get("reportList");
 	    if(agreeStr == null){
@@ -335,14 +335,14 @@ public class ShareService {
 				}
 			}
 	    }
-	    if(disagreeStr == null){
-	    	map.put("disagreeNum", 0);
+	    if(shareStr == null){
+	    	map.put("shareNum", 0);
 	    } else {
-	    	List<String> disagreeList = Arrays.asList(disagreeStr.toString().split(","));
-	    	map.put("disagreeNum", disagreeList.size());
-	    	for (String str : disagreeList) {
+	    	List<String> shareList = Arrays.asList(shareStr.toString().split(","));
+	    	map.put("shareNum", shareList.size());
+	    	for (String str : shareList) {
 	    		if (str.equals(nowUid.toString())){
-	    			map.put("disagreeFlag", 1);
+	    			map.put("shareFlag", 1);
 	    			break;
 	    		}
 	    	}
@@ -400,7 +400,7 @@ public class ShareService {
 
 	public Object getExperienceListByUid(Integer start, Integer count, String nowUid) {
 		List<Map<String, Object>> list = this.shareDao.getExperienceListByUid(start, count, nowUid);
-		list = this.getMoreListDetail(list, nowUid , 2);
+		list = this.getMoreListDetail(list, nowUid );
 		return null;
 	}
 
@@ -410,27 +410,56 @@ public class ShareService {
 		return 0;
 	}
 
-	public List<Map<String, Object>> loadBookList(Integer start, Integer count, Integer bookType) {
-		List<Map<String, Object>> list = this.shareDao.loadBookList(start, count ,bookType);
-		for (Map<String, Object> map : list) {
-			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
-			map.put("nickName", userMap.get("nickName").toString());
-			map.put("avatarUrl", userMap.get("avatarUrl").toString());
-			map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
-		}
-		return list;
+	public List<Map<String, Object>> loadBookList(Integer start, Integer count, Integer bookType ,String searchName) {
+		List<Map<String, Object>> list = this.shareDao.loadBookList(start, count ,bookType,searchName);
+		 if(list == null || list.size() == 0) {
+			 return new ArrayList<Map<String, Object>>();
+		 }else {
+			 for (Map<String, Object> map : list) {
+					Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+					map.put("nickName", userMap.get("nickName").toString());
+					map.put("avatarUrl", userMap.get("avatarUrl").toString());
+					map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+				}
+				return list;
+		 }
+		
 	}
 
 	public List<Map<String, Object>> searchCoursewareList(Integer start, Integer count,  String searchName) {
 		// TODO Auto-generated method stub
 		List<Map<String, Object>> list = this.shareDao.searchCoursewareList(start, count ,searchName);
-		for (Map<String, Object> map : list) {
-			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
-			map.put("nickName", userMap.get("nickName").toString());
-			map.put("avatarUrl", userMap.get("avatarUrl").toString());
-			map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
-		}
-		return list;
+		if(list == null || list.size() == 0) {
+			 return new ArrayList<Map<String, Object>>();
+		 }else {
+			 for (Map<String, Object> map : list) {
+					Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+					map.put("nickName", userMap.get("nickName").toString());
+					map.put("avatarUrl", userMap.get("avatarUrl").toString());
+					map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+				}
+				return list;
+		 }
+		
+	}
+
+	public List<Map<String, Object>> loadQuesAndShareList(Integer start, Integer count, String searchName ,String nowUid) {
+		// TODO Auto-generated method stub
+		
+		List<Map<String, Object>> list = this.shareDao.loadQuesAndShareList(start, count ,searchName);
+		 if(list == null || list.size() == 0) {
+			 return new ArrayList<Map<String, Object>>();
+		 }else {
+			 list = this.getMoreListDetail(list, nowUid );
+				return list;
+		 }
+//		for (Map<String, Object> map : list) {
+//			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+//			map.put("nickName", userMap.get("nickName").toString());
+//			map.put("avatarUrl", userMap.get("avatarUrl").toString());
+//			map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+//		}
+		
 	}
 
 //	public Object loadExperienceList(Integer start, Integer count, String nowUid) {
