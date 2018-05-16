@@ -233,6 +233,7 @@ public class ShareDao {
 			sql = "select * from experienceshare where content like '%" + searchName + "%' and score > 4  union select * from experienceshare where content like '%" + searchName + "%' and score > 4  order by createTimeStamp desc limit ?,?";
 		}
 		return this.jdbcTemplate.queryForList(sql , start, count);
+	}
 
 	public void addToChatLog(String nowUid, String toUid, String message, int state) {
 		String sql = "insert into chatLog (uid, toUid, content, createTimeStamp, state) values(?,?,?,?,?)";
