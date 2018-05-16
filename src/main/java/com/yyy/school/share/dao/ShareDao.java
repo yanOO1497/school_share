@@ -212,6 +212,7 @@ public class ShareDao {
 	}
 
 
+
 	public List<Map<String, Object>> searchCoursewareList(Integer start, Integer count, String searchName) {
 		String sql;
 		if (searchName.equals("")) {
@@ -232,6 +233,32 @@ public class ShareDao {
 			sql = "select * from experienceshare where content like '%" + searchName + "%' and score > 4  union select * from experienceshare where content like '%" + searchName + "%' and score > 4  order by createTimeStamp desc limit ?,?";
 		}
 		return this.jdbcTemplate.queryForList(sql , start, count);
+
+	public void addToChatLog(String nowUid, String toUid, String message, int state) {
+		String sql = "insert into chatLog (uid, toUid, content, createTimeStamp, state) values(?,?,?,?,?)";
+		this.jdbcTemplate.update(sql, nowUid, toUid, message, System.currentTimeMillis(), state);
+	}
+
+
+	//聊天记录标记为已读
+	public void setAlreadyRead(String nowUid, String toUid) {
+		String sql = "update chatLog set state = 1 where toUid = ? and uid = ?";
+		this.jdbcTemplate.update(sql, nowUid, toUid);
+	}
+
+
+	public List<Map<String, Object>> getChatLogDetails(String nowUid,
+			String toUid, Integer start, Integer count) {
+		String sql = "select * from chatLog where uid = ? and toUid = ? order by createTimeStamp desc limit ?,?";
+		return this.jdbcTemplate.queryForList(sql, toUid, nowUid, start, count);
+	}
+
+
+	public List<Map<String, Object>> getChats(String nowUid, Integer start,
+			Integer count) {
+		String sql = "select * from chatLog where toUid = ? group by uid order by createTimeStamp desc limit ?,?";
+		return this.jdbcTemplate.queryForList(sql, nowUid, start, count);
+
 	}
 
 	

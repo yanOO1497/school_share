@@ -20,20 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-//add
-//import javax.jms.JMSException;  
-//import javax.jms.Message;  
-//import javax.jms.MessageListener;  
-//import javax.jms.TextMessage;  
-//  
-//import org.apache.log4j.Logger;  
-//import org.springframework.stereotype.Component;  
-//  
-//import com.alibaba.fastjson.JSON; 
-//add
+
 import com.yyy.school.share.dao.ShareDao;
 import com.yyy.school.share.util.QiniuUtil;
-//import com.yyy.school.share.util.WebsocketController;
 
 @Service
 public class ShareService {
@@ -461,6 +450,30 @@ public class ShareService {
 //		}
 		
 	}
+
+	public List<Map<String, Object>> getChatLogDetails(String nowUid, String toUid, Integer start, Integer count) {
+		this.shareDao.setAlreadyRead(nowUid, toUid); //设为已读
+		List<Map<String, Object>> list = this.shareDao.getChatLogDetails(nowUid, toUid, start, count);
+		if(list == null || list.size() == 0){
+			return new ArrayList<Map<String, Object>>();
+		}
+		return list;
+	}
+
+	public List<Map<String, Object>> getChats(String nowUid, Integer start, Integer count) {
+		List<Map<String, Object>> list = this.shareDao.getChats(nowUid, start, count);
+		if (list == null || list.size() == 0){
+			return new ArrayList<Map<String, Object>>();
+		} else {
+			return list;
+		}
+		
+	}
+	
+	
+	
+	
+	
 
 //	public Object loadExperienceList(Integer start, Integer count, String nowUid) {
 //		List<Map<String, Object>> list = this.shareDao.loadExperienceList(start, count);

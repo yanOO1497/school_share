@@ -81,7 +81,7 @@
 				class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
 		</property>
 	</bean>
-
+	
 	<mvc:resources mapping="/images/**"
 		location="/WEB-INF/static/images/" />
 	<!-- <mvc:resources mapping="/js/**" location="/WEB-INF/js/" cache-period="31556926"/> -->

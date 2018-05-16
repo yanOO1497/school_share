@@ -376,22 +376,27 @@ public class ShareController {
 			return jsonEntity(result);
 		}
 	}
-	@RequestMapping(value = "sentMessage.do")
-	public ResponseEntity<String> sentMessage(String uid, String content, String nowUid) throws IOException {
-		System.out.println("publish call");
-		
+	
+	@RequestMapping(value = "getChatLogDetails.do")
+	public ResponseEntity<String> getChatLogDetails(String nowUid, String toUid, Integer start, Integer count){
+		System.out.println("getChatLogDetails call");
 		
 		Map<String, Object> result = new HashMap<String, Object>();
-		int i = this.shareService.sentMessage(uid, content,  nowUid);
-		if (i != 1){
-			result.put("code", 99);
-			result.put("msg", "发布失败");
-			return jsonEntity(result);
-		} else {
-			result.put("code", 100);
-			result.put("msg", "发布成功");
-			return jsonEntity(result);
-		}
+		result.put("code", 100);
+		result.put("msg", "查询成功");
+		result.put("subjects", this.shareService.getChatLogDetails(nowUid, toUid, start, count));
+		return jsonEntity(result);
+	}
+	
+	@RequestMapping(value = "getChats.do")
+	public ResponseEntity<String> getChats(String nowUid, Integer start, Integer count){
+		System.out.println("getChats call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "查询成功");
+		result.put("subjects", this.shareService.getChats(nowUid, start, count));
+		return jsonEntity(result);
 	}
 	
 }
