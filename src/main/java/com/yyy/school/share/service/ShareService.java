@@ -483,6 +483,10 @@ public class ShareService {
 		}
 		
 		for (Map<String, Object> map : list) {
+			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("toUid").toString());
+			map.put("toNickName", userMap.get("nickName").toString());
+			map.put("toAvatarUrl", userMap.get("avatarUrl").toString());
+			
 			Map<String, Object> nowUserMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
 			map.put("nowNickName", nowUserMap.get("nickName").toString());
 			map.put("nowAvatarUrl", nowUserMap.get("avatarUrl").toString());
@@ -517,8 +521,12 @@ public class ShareService {
 			List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(list.subList(start, start + count));
 			for (Map<String, Object> map : result) {
 				Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("toUid").toString());
-				map.put("nickName", userMap.get("nickName").toString());
-				map.put("avatarUrl", userMap.get("avatarUrl").toString());
+				map.put("toNickName", userMap.get("nickName").toString());
+				map.put("toAvatarUrl", userMap.get("avatarUrl").toString());
+				
+				Map<String, Object> nowUserMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+				map.put("nowNickName", nowUserMap.get("nickName").toString());
+				map.put("nowAvatarUrl", nowUserMap.get("avatarUrl").toString());
 				map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
 			}
 			return result;
