@@ -399,4 +399,14 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
+	@RequestMapping(value = "getCarousel.do")
+	public ResponseEntity<String> getCarousel( Integer count){
+		System.out.println("getChats call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "查询成功");
+		result.put("subjects", this.shareService.getCarousel(count));
+		return jsonEntity(result);
+	}
 }

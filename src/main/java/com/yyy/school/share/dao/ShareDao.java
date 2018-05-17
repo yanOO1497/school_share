@@ -230,14 +230,14 @@ public class ShareDao {
 		if (searchName.equals("")) {
 			sql = "select * from question where score > 4  union select * from experienceshare where score > 4  order by createTimeStamp desc limit ?,?";
 		} else {
-			sql = "select * from experienceshare where content like '%" + searchName + "%' and score > 4  union select * from experienceshare where content like '%" + searchName + "%' and score > 4  order by createTimeStamp desc limit ?,?";
+			sql = "select * from question where content like '%" + searchName + "%' and score > 4  union select * from experienceshare where content like '%" + searchName + "%' and score > 4  order by createTimeStamp desc limit ?,?";
 		}
 		return this.jdbcTemplate.queryForList(sql , start, count);
 	}
 
-	public void addToChatLog(String nowUid, String toUid, String message, int state) {
+	public void addToChatLog(String nowUid, String toUid, String message, int state, Long time) {
 		String sql = "insert into chatLog (uid, toUid, content, createTimeStamp, state) values(?,?,?,?,?)";
-		this.jdbcTemplate.update(sql, nowUid, toUid, message, System.currentTimeMillis(), state);
+		this.jdbcTemplate.update(sql, nowUid, toUid, message, time, state);
 	}
 
 
@@ -250,18 +250,45 @@ public class ShareDao {
 
 	public List<Map<String, Object>> getChatLogDetails(String nowUid,
 			String toUid, Integer start, Integer count) {
-		String sql = "select * from chatLog where uid = ? and toUid = ? order by createTimeStamp desc limit ?,?";
-		return this.jdbcTemplate.queryForList(sql, toUid, nowUid, start, count);
+		String sql = "select * from chatLog where (uid = ? and toUid = ?) or (uid = ? and toUid = ?)  order by createTimeStamp limit ?,?";
+		return this.jdbcTemplate.queryForList(sql, nowUid, toUid, toUid, nowUid, start, count);
 	}
-
 
 	public List<Map<String, Object>> getChats(String nowUid, Integer start,
 			Integer count) {
-		String sql = "select * from chatLog where toUid = ? group by uid order by createTimeStamp desc limit ?,?";
-		return this.jdbcTemplate.queryForList(sql, nowUid, start, count);
-
+		List<Map<String, Object>> subjects = new ArrayList<Map<String, Object>>();
+		String sql = "(select  uid as id from chatLog where toUid = ? group by uid) union" + 
+					"(select  toUid as id from chatLog where uid = ? group by toUid)";
+		List<Map<String, Object>> list =  this.jdbcTemplate.queryForList(sql, nowUid, nowUid);
+		if (list == null || list.size() == 0){
+			return new ArrayList<Map<String, Object>>();
+		}
+		for (Map<String, Object> map : list) {
+			String toUid = map.get("id").toString();
+			Map<String, Object> toUidMap = getChatLogDetails(nowUid, toUid, 0, 1).get(0); //取与该用户最近的一条聊天记录。
+			toUidMap.put("unreadNum", getUnreadByUid(nowUid, toUid));
+			subjects.add(toUidMap);
+		}
+		return subjects;
 	}
 
-	
+
+	public int getUnreadByUid(String nowUid, String toUid) {
+		String sql = "select count(1) as unread from chatLog where uid = ? and toUid = ? and state = 0";
+		return Integer.parseInt(this.jdbcTemplate.queryForMap(sql, toUid, nowUid).get("unread").toString());
+	}
+
+
+	public List<Map<String, Object>> getCarouselInBooks(Integer count) {
+		// TODO Auto-generated method stub
+		String sql = "select * from books  order by createTimeStamp desc limit 0,?";
+		return this.jdbcTemplate.queryForList(sql, count);
+	}
+
+	public List<Map<String, Object>> getCarouselInCourseware(Integer count) {
+		// TODO Auto-generated method stub
+		String sql = "select * from courseware  order by createTimeStamp desc limit 0,?";
+		return this.jdbcTemplate.queryForList(sql, count);
+	}
 	
 }

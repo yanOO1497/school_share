@@ -33,6 +33,28 @@ public class ShareService {
 	public static QiniuUtil qiniuUtil = new QiniuUtil();
 	
 	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
+	public boolean sort(final List<Map<String, Object>> list, final String sort, final int sortType) {
+
+		Collections.sort(list, new Comparator<Map<String, Object>>() {
+
+			@Override
+			public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+				if (sort.equals("createTimeStamp")) {
+					Long t1 = (Long) o1.get(sort);
+					Long t2 = (Long) o2.get(sort);
+					return sortType == 0 ? t2.compareTo(t1) : t1.compareTo(t2);
+				} else { // 默认以createTime为排序标准
+					Long t1 = (Long) o1.get(sort);
+					Long t2 = (Long) o2.get(sort);
+					return sortType == 0 ? t2.compareTo(t1) : t1.compareTo(t2);
+				}
+			}
+		});
+		return true;
+	}
+
+	
 	// 处理获取信息列表的点赞等信息
 	 public List<Map<String, Object>> getMoreListDetail (List<Map<String, Object>> list,String nowUid) {
 	    	for (Map<String, Object> map : list) {
@@ -454,9 +476,19 @@ public class ShareService {
 	public List<Map<String, Object>> getChatLogDetails(String nowUid, String toUid, Integer start, Integer count) {
 		this.shareDao.setAlreadyRead(nowUid, toUid); //设为已读
 		List<Map<String, Object>> list = this.shareDao.getChatLogDetails(nowUid, toUid, start, count);
+		
+		
 		if(list == null || list.size() == 0){
 			return new ArrayList<Map<String, Object>>();
 		}
+		
+		for (Map<String, Object> map : list) {
+			Map<String, Object> nowUserMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+			map.put("nowNickName", nowUserMap.get("nickName").toString());
+			map.put("nowAvatarUrl", nowUserMap.get("avatarUrl").toString());
+			map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+		}
+		
 		return list;
 	}
 
@@ -465,9 +497,50 @@ public class ShareService {
 		if (list == null || list.size() == 0){
 			return new ArrayList<Map<String, Object>>();
 		} else {
-			return list;
+			sort(list, "createTimeStamp", 0);
+			if (list.size() - start < count) {
+				List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(list.subList(start, list.size()));
+				for (Map<String, Object> map : result) {
+					Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("toUid").toString());
+					map.put("toNickName", userMap.get("nickName").toString());
+					map.put("toAvatarUrl", userMap.get("avatarUrl").toString());
+					
+					Map<String, Object> nowUserMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+					map.put("nowNickName", nowUserMap.get("nickName").toString());
+					map.put("nowAvatarUrl", nowUserMap.get("avatarUrl").toString());
+					
+					map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+				}
+				return result;
+			}
+			
+			List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(list.subList(start, start + count));
+			for (Map<String, Object> map : result) {
+				Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("toUid").toString());
+				map.put("nickName", userMap.get("nickName").toString());
+				map.put("avatarUrl", userMap.get("avatarUrl").toString());
+				map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+			}
+			return result;
 		}
 		
+	}
+
+	public  List<Map<String, Object>>  getCarousel(Integer count) {
+		// TODO Auto-generated method stub
+		List<Map<String, Object>> list1 = this.shareDao.getCarouselInBooks(count);
+		List<Map<String, Object>> list2 = this.shareDao.getCarouselInCourseware(count);
+        //将集合2的内容全添加到集合中
+        list1.addAll(list2);
+        sort(list1, "createTimeStamp", 0);
+        for (Map<String, Object> map : list1) {
+			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+			map.put("nickName", userMap.get("nickName").toString());
+			map.put("avatarUrl", userMap.get("avatarUrl").toString());
+			map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+		}
+        
+		return list1;
 	}
 	
 	

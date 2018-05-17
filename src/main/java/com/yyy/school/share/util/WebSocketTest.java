@@ -115,13 +115,15 @@ public class WebSocketTest {
     	String message = messageStr.split("[|]")[0];
     	String toUid = messageStr.split("[|]")[1];
         String now = getNowTime();
+        Long time = System.currentTimeMillis();
+//        message = message + "|" + now;
         try {
             if (webSocketSet.get(toUid) != null) {
-                webSocketSet.get(toUid).sendMessage(now + "用户" + nowUid + "发来消息：" + " <br/> " + message);
-                webSocketTest.shareDao.addToChatLog(nowUid, toUid, message, 1);
+                webSocketSet.get(toUid).sendMessage(message + "|" + now);
+                webSocketTest.shareDao.addToChatLog(nowUid, toUid, message, 1, time);
             } else {
                 System.out.println(toUid + "当前用户不在线"); 
-                webSocketTest.shareDao.addToChatLog(nowUid, toUid, message, 0);
+                webSocketTest.shareDao.addToChatLog(nowUid, toUid, message, 0, time);
             }
         } catch (IOException e) {
             e.printStackTrace();
