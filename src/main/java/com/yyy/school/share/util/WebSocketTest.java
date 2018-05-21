@@ -63,13 +63,6 @@ public class WebSocketTest {
         webSocketSet.put(param, this);//加入map中
         addOnlineCount();           //在线数加1
         System.out.println("有新连接加入！当前在线人数为" + getOnlineCount());
-        try {
-			this.sendMessage("woyaoopao");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-       
     }
 
 
@@ -116,7 +109,6 @@ public class WebSocketTest {
     	String toUid = messageStr.split("[|]")[1];
         String now = getNowTime();
         Long time = System.currentTimeMillis();
-//        message = message + "|" + now;
         try {
             if (webSocketSet.get(toUid) != null) {
                 webSocketSet.get(toUid).sendMessage(message + "|" + now);

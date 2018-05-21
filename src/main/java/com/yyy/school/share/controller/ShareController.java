@@ -36,10 +36,10 @@ public class ShareController {
 	private ShareService shareService;
 	
 	@RequestMapping(value = "saveUserInfo.do")
-	public ResponseEntity<String> saveUserInfo(String uid, String nickName, String avatarUrl, @RequestParam(value = "school", defaultValue = "")String school, Integer sex){
+	public ResponseEntity<String> saveUserInfo(String uid, String nickName, String avatarUrl,  Integer sex){
 		System.out.println("saveUserInfo call");
 		
-		int i = this.shareService.saveUserInfo(uid, nickName, avatarUrl, school, sex);
+		int i = this.shareService.saveUserInfo(uid, nickName, avatarUrl, sex);
 		Map<String, Object> result = new HashMap<String, Object>();
 		if(i != 1){
 			result.put("code", 99);
@@ -51,11 +51,10 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
-	@RequestMapping(value = "setBioByUid.do")
-	public ResponseEntity<String> setBioByUid(String bio, String uid){
-		System.out.println("setBioByUid call");
-		
-		int i = this.shareService.setBioByUid(bio, uid);
+	@RequestMapping(value = "setUserInfo.do")
+	public ResponseEntity<String> setUserInfo(String nowUid,String nickName,String bio,String school,String qq,String wechat,Integer sex){
+		System.out.println("setUserInfo call");
+		int i = this.shareService.setUserInfo( nowUid,nickName,bio,school,qq,wechat,sex);
 		Map<String, Object> result = new HashMap<String, Object>();
 		if(i != 1){
 			result.put("code", 99);
@@ -160,6 +159,33 @@ public class ShareController {
 			return jsonEntity(result);
 	}
 	
+	@RequestMapping(value = "loadCollectList.do")
+	public ResponseEntity<String> loadCollectList(Integer start, Integer count,String nowUid){
+			System.out.println("loadCollectList call");
+
+			Map<String, Object> result = new HashMap<String, Object>();
+			result.put("code", 100);
+			result.put("msg", "查询成功");
+			result.put("type", "question");
+			result.put("nowUid", nowUid);
+			result.put("subjects", this.shareService.loadCollectList(start, count, nowUid));
+			return jsonEntity(result);
+	}
+	
+	@RequestMapping(value = "loadTableListByUid.do")//获取用户发布的信息列表
+	public ResponseEntity<String> loadTableListByUid(Integer start,  Integer count, String uid){
+			System.out.println("loadTableListByUid call");
+
+			Map<String, Object> result = new HashMap<String, Object>();
+			result.put("code", 100);
+			result.put("msg", "查询成功");
+			result.put("type", "question");
+			result.put("uid", uid);
+			result.put("subjects", this.shareService.loadTableListByUid(start, count, uid));
+			return jsonEntity(result);
+	}
+	
+	
 	@RequestMapping(value = "loadBookList.do")
 	public ResponseEntity<String> loadBookList(Integer start, Integer bookType, Integer count ,@RequestParam(value = "searchName", defaultValue = "") String searchName){
 			System.out.println("loadBookList call");
@@ -201,6 +227,7 @@ public class ShareController {
 		result.put("code", 100);
 		result.put("msg", "查询成功");
 		result.put("result", this.shareService.loadUserInfoDetails(uid));
+		result.put("subjects", this.shareService.loadTableListByUid(0,1,uid));
 		return jsonEntity(result);
 	}
 	
@@ -296,12 +323,12 @@ public class ShareController {
 		return jsonEntity(result);
 }
 	
-	@RequestMapping(value = "deleteFromQuestionByMid.do")
-	public ResponseEntity<String> deleteFromQuestionByMid(Integer mid){
-		System.out.println("deleteFromQuestionByMid call");
+	@RequestMapping(value = "deleteTableByMidAndType.do")
+	public ResponseEntity<String> deleteTableByMidAndType(Integer mid ,Integer type ){
+		System.out.println("deleteTableByMidAndType call");
 		
 		Map<String, Object> result = new HashMap<String, Object>();
-		int i = this.shareService.deleteFromQuestionByMid(mid);
+		int i = this.shareService.deleteTableByMidAndType(mid,type);
 		if(i != 1){
 			result.put("code", 99);
 			result.put("msg", "删除失败");
@@ -334,9 +361,9 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
-	@RequestMapping(value = "uploadPic.do", method = RequestMethod.POST)
-	public ResponseEntity<String> uploadPic(HttpServletRequest request) throws Exception{
-		System.out.println("uploadPic call" );
+	@RequestMapping(value = "uploadFile.do", method = RequestMethod.POST)
+	public ResponseEntity<String> uploadFile(HttpServletRequest request) throws Exception{
+		System.out.println("uploadFile call" );
 		Long time = System.currentTimeMillis();
 		String uid = request.getParameter("uid");
 		Integer type = Integer.parseInt(request.getParameter("type"));
@@ -361,7 +388,7 @@ public class ShareController {
 	@RequestMapping(value = "publish.do")
 	public ResponseEntity<String> publish(String uid,String[] successUrl,String[] cancelUrl, Integer type, String content, 
 			@RequestParam(value = "reward", defaultValue = "")String reward, Integer flag) throws IOException {
-		System.out.println("publish call");
+		System.out.println("publish call"+content);
 		
 		
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -391,7 +418,6 @@ public class ShareController {
 	@RequestMapping(value = "getChats.do")
 	public ResponseEntity<String> getChats(String nowUid, Integer start, Integer count){
 		System.out.println("getChats call");
-		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 100);
 		result.put("msg", "查询成功");
@@ -399,6 +425,16 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
+	@RequestMapping(value = "getUnreadMessage.do")
+	public ResponseEntity<String> getUnreadMessage(String nowUid, Integer start, Integer count){
+		System.out.println("getUnreadMessage call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "查询成功");
+		result.put("subjects", this.shareService.getUnreadMessage(nowUid, start, count));
+		return jsonEntity(result);
+	}
 	@RequestMapping(value = "getCarousel.do")
 	public ResponseEntity<String> getCarousel( Integer count){
 		System.out.println("getChats call");

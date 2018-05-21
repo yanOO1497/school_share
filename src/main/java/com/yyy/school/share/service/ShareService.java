@@ -145,6 +145,30 @@ public class ShareService {
 		}
 		return list;
 	}
+
+	public Object loadCollectList(Integer start, Integer count, String nowUid) {
+List<Map<String, Object>> list = this.shareDao.loadCollectList(start, count ,nowUid);
+		
+		list = this.getMoreListDetail(list, nowUid);
+		//举报次数超过20，不显示
+		for (int i = list.size()-1; i >= 0; i--){
+			if ((Integer)list.get(i).get("reportNum") >= 20){
+				list.remove(i);
+			}
+		}
+		return list;
+	}
+	public List<Map<String, Object>> loadTableListByUid(Integer start, Integer count, String uid) {
+		List<Map<String, Object>> list = this.shareDao.loadTableListByUid(start, count ,uid);
+		list = this.getMoreListDetail(list, uid);
+		//举报次数超过20，不显示
+		for (int i = list.size()-1; i >= 0; i--){
+			if ((Integer)list.get(i).get("reportNum") >= 20){
+				list.remove(i);
+			}
+		}
+		return list;
+	}
 	
 	public Map<String, Object> loadUserInfoDetails(String uid) {
 		return this.shareDao.getUserInfoByUid(uid);
@@ -254,16 +278,10 @@ public class ShareService {
 		return map;
 	}
 
-	public int saveUserInfo(String uid, String nickName, String avatarUrl, String school,
-			Integer sex) {
-		return this.shareDao.saveUserInfo(uid, nickName, avatarUrl, school, sex);
+	public int saveUserInfo(String uid, String nickName, String avatarUrl, Integer sex) {
+		return this.shareDao.saveUserInfo(uid, nickName, avatarUrl, sex);
 		
 	}
-
-	public int setBioByUid(String bio, String uid) {
-		return this.shareDao.setBioByUid(bio, uid);
-	}
-
 //	public int addToQuestion(String content, String picUrl, String uid) {
 //		return this.shareDao.addToQuestion(content, picUrl, uid);
 //	}
@@ -293,8 +311,8 @@ public class ShareService {
 		return list;
 	}
 
-	public int deleteFromQuestionByMid(Integer mid) {
-		return this.shareDao.deleteFromQuestionByMid(mid);
+	public int deleteTableByMidAndType(Integer mid,Integer type ) {
+		return this.shareDao.deleteTableByMidAndType(mid,type );
 	}
 
 	public String uploadPic(String filePath, String fileName) {
@@ -443,6 +461,7 @@ public class ShareService {
 		if(list == null || list.size() == 0) {
 			 return new ArrayList<Map<String, Object>>();
 		 }else {
+			
 			 for (Map<String, Object> map : list) {
 					Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
 					map.put("nickName", userMap.get("nickName").toString());
@@ -550,6 +569,35 @@ public class ShareService {
         
 		return list1;
 	}
+
+
+	public List<Map<String, Object>> getUnreadMessage(String nowUid, Integer start, Integer count) {
+		List<Map<String, Object>> list1 = this.shareDao.getUnreadComment(nowUid, start, count);//获取用户发布信息被评论的未读消息
+		List<Map<String, Object>> list2 = this.shareDao.getUnreadReply(nowUid, start, count);//获取用户评论被回复的未读消息
+		for (Map<String, Object> map : list2) {		
+			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+			map.put("nickName", userMap.get("nickName").toString());
+			map.put("avatarUrl", userMap.get("avatarUrl").toString());	
+			map.put("createTime", sdf.format(new Date((Long)map.get("createTimeStamp"))));
+			map.put("messageType", "reply");
+		}
+		for (Map<String, Object> map : list1) {	
+			Map<String, Object> userMap = this.shareDao.getUserInfoByUid(map.get("uid").toString());
+			map.put("nickName", userMap.get("nickName").toString());
+			map.put("avatarUrl", userMap.get("avatarUrl").toString());	
+			
+			map.put("messageType", "comment");
+		}
+		list2.addAll(list1);
+		return list2;
+	}
+
+
+	public int setUserInfo(String nowUid, String nickName, String bio, String school, String qq, String wechat, Integer sex) {
+		return this.shareDao.setUserInfo( nowUid,nickName,bio,school, wechat,qq, sex);
+	}
+
+
 	
 	
 	

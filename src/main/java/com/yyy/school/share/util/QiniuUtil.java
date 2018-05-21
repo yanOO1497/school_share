@@ -1,8 +1,6 @@
 package com.yyy.school.share.util;
 
 import java.io.IOException;
-import java.util.UUID;
-
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
@@ -14,10 +12,8 @@ public class QiniuUtil {
      //设置需要操作的账号的AK和SK
      private static final String ACCESS_KEY = "TuH0B0O95mkXeHk8V8oAwjC4UtEFf-rMffUypEeq";   
      private static final String SECRET_KEY = "i9Nwv7DlzGudpe43lj35XmpVbH5pn3x3xxB6XGyQ";  
-
      //要上传的空间  
      private static final String bucketname = "schoolshare";      
-
      //密钥  
      private static final Auth auth = Auth.create(ACCESS_KEY, SECRET_KEY);  
 

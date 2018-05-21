@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Repository
@@ -72,6 +73,7 @@ public class ShareDao {
 		return this.jdbcTemplate.queryForList(sql, mid);
 	}
 	
+	
 	public List<Map<String, Object>> getReport(Integer type, Integer mid) {
 		String tableName =this.getTableNameByType(type);
 		String sql = "select reportList from " + tableName + "  where id = ?";
@@ -104,14 +106,15 @@ public class ShareDao {
 		
 	}
 
-	public int saveUserInfo(String uid, String nickName, String avatarUrl, String school, Integer sex) {
+	public int saveUserInfo(String uid, String nickName, String avatarUrl,  Integer sex) {
+		
 		String getSql = "select * from user where id = ?";
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(getSql, uid);
 		if(list.size() != 0 && list != null){
 			return 1;
 		}
-		String sql = "insert into user (id, nickName, avatarUrl, school, createTimeStamp, sex) values(?,?,?,?,?,?)";
-		return this.jdbcTemplate.update(sql, uid, nickName, avatarUrl, school, System.currentTimeMillis(), sex);
+		String sql = "insert into user (id, nickName, avatarUrl, createTimeStamp, sex) values(?,?,?,?,?)";
+		return this.jdbcTemplate.update(sql, uid, nickName, avatarUrl, System.currentTimeMillis(), sex);
 		
 	}
 	
@@ -150,15 +153,15 @@ public class ShareDao {
 		return this.jdbcTemplate.queryForList(sql, nowUid, start, count);
 	}
 
-	public int deleteFromQuestionByMid(Integer mid) {
-		String sql = "delete from question where id = ?";
+	public int deleteTableByMidAndType(Integer mid,Integer type) {
+		String tableName = this.getTableNameByType(type);
+		String sql = "delete from " + tableName + " where id = ?";
 		return this.jdbcTemplate.update(sql, mid);
 	}
 
 	public void addToFeedback(String uid, String content) {
 		String sql = "insert into feedback (uid, content, createTimeStamp) values(?,?,?)";
-		this.jdbcTemplate.update(sql, uid, content, System.currentTimeMillis());
-		
+		this.jdbcTemplate.update(sql, uid, content, System.currentTimeMillis());	
 	}
 
 	public Map<String, Object> getMessageByMidAndType(Integer type, Integer mid) {
@@ -195,17 +198,30 @@ public class ShareDao {
 
 	public List<Map<String, Object>> loadTableList(Integer start, Integer count, Integer tableType) {
 		String tableName = this.getTableNameByType(tableType);
-		String sql = "select * from "+ tableName +" order by createTimeStamp desc limit ?,?";
+			String sql = "select * from "+ tableName +" order by createTimeStamp desc limit ?,?";	
 		return this.jdbcTemplate.queryForList(sql, start, count);
 	}
-
-
+	public List<Map<String, Object>> loadCollectList(Integer start, Integer count ,String nowUid) {
+		String sql = "select * from tableview WHERE collectList REGEXP '^"+nowUid+",|,"+nowUid+"$|,"+nowUid+",' order by createTimeStamp desc limit ?,?";	
+	return this.jdbcTemplate.queryForList(sql, start, count);
+	}
+	public List<Map<String, Object>> loadTableListByUid(Integer start, Integer count,String uid) {
+		String sql = "select * from tableview  where uid = ? order by createTimeStamp desc limit ?,?";	
+		return this.jdbcTemplate.queryForList(sql,uid, start, count);
+	}
+	
+	public Integer loadTablesUidById(Integer tableType,Integer id) {
+		String tableName = this.getTableNameByType(tableType);
+		String sql = "select uid from "+ tableName +" where id= ? ";	
+		return (Integer)this.jdbcTemplate.queryForMap(sql, id).get("uid");
+	}
+	
 	public List<Map<String, Object>> loadBookList(Integer start, Integer count, Integer bookType , String searchName) {
 		String sql;
 		if (searchName.equals("")) {
-			sql = "select * from books where type = ? order by createTimeStamp desc limit ?,?";
+			sql = "select * from books where bookType = ? order by createTimeStamp desc limit ?,?";
 		} else {
-			sql = "select * from books where bookName like '%" + searchName + "%' and type = ? order by createTimeStamp desc limit ?,?";
+			sql = "select * from books where bookName like '%" + searchName + "%' and bookType = ? order by createTimeStamp desc limit ?,?";
 		}
 		
 		return this.jdbcTemplate.queryForList(sql, bookType , start, count);
@@ -250,8 +266,14 @@ public class ShareDao {
 
 	public List<Map<String, Object>> getChatLogDetails(String nowUid,
 			String toUid, Integer start, Integer count) {
-		String sql = "select * from chatLog where (uid = ? and toUid = ?) or (uid = ? and toUid = ?)  order by createTimeStamp limit ?,?";
-		return this.jdbcTemplate.queryForList(sql, nowUid, toUid, toUid, nowUid, start, count);
+		if(count == 0) {
+			String sql = "select * from chatLog where (uid = ? and toUid = ?) or (uid = ? and toUid = ?)  order by createTimeStamp ";
+			return this.jdbcTemplate.queryForList(sql, nowUid, toUid, toUid, nowUid);
+		}else {
+			String sql = "select * from chatLog where (uid = ? and toUid = ?) or (uid = ? and toUid = ?)  order by createTimeStamp limit ?,?";
+			return this.jdbcTemplate.queryForList(sql, nowUid, toUid, toUid, nowUid, start, count);
+		}
+		
 	}
 
 	public List<Map<String, Object>> getChats(String nowUid, Integer start,
@@ -265,7 +287,9 @@ public class ShareDao {
 		}
 		for (Map<String, Object> map : list) {
 			String toUid = map.get("id").toString();
-			Map<String, Object> toUidMap = getChatLogDetails(nowUid, toUid, 0, 1).get(0); //取与该用户最近的一条聊天记录。
+			List<Map<String, Object>> listDetail = getChatLogDetails(nowUid, toUid,0,0);			
+			Map<String, Object> toUidMap = listDetail.get(listDetail.size()-1); //取与该用户最近的一条聊天记录。
+//			System.out.println(listDetail.size());
 			toUidMap.put("unreadNum", getUnreadByUid(nowUid, toUid));
 			subjects.add(toUidMap);
 		}
@@ -286,9 +310,76 @@ public class ShareDao {
 	}
 
 	public List<Map<String, Object>> getCarouselInCourseware(Integer count) {
-		// TODO Auto-generated method stub
 		String sql = "select * from courseware  order by createTimeStamp desc limit 0,?";
 		return this.jdbcTemplate.queryForList(sql, count);
 	}
+
+	public List<Map<String, Object>> getUnreadReply(String nowUid, Integer start, Integer count) {//未读的回复消息
+		String sql = "select * from comment where fatherId in (select id from comment where uid = ?) and state = 0 order by createTimeStamp desc limit ?,?";
+		List<Map<String, Object>> list =  this.jdbcTemplate.queryForList(sql, nowUid, start, count);
+		return list;
+		
+	}
+
+	 public static List<Map<String, Object>> getRepetition(List<Map<String, Object>> list1,  
+			 List<Map<String, Object>> list2) {  
+		 List<Map<String, Object>> result =new ArrayList<Map<String, Object>>();  
+	        for (Map<String, Object> map : list2) {//遍历list1  
+	            if (list1.contains(map)) {//如果存在这个数  
+	                result.add(map);//放进一个list里面，这个list就是交集  
+	            }  
+	        }  
+	        return result;  
+	    }  
+//	public List<Map<String, Object>> getUnreadComment(String nowUid, Integer start, Integer count) {//未读的评论消息（指代）	
+//		
+//		String sql1;
+//		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+//		String tableName[]= {"","question", "experienceshare", "rewardhelp", "schoolactivity", "secondarymarket"};
+//		for (int i = 1; i < 6 ; i++) {
+//			sql1 = "select id as mid,type from "+tableName[i]+" where uid  = ? order by createTimeStamp";	
+//			list.addAll(this.jdbcTemplate.queryForList(sql1, nowUid));
+//		}//获取用户发布的所有信息id与type
+//		
+//		String sql2 = "select mid,type from comment where id in (select id from comment where fatherId = 0 ) and uid != ? order by createTimeStamp ";
+//		List<Map<String, Object>> list2 =  this.jdbcTemplate.queryForList(sql2,nowUid);//获取直接评论信息的、且非该用户发表的评论
+//			
+//		List<Map<String, Object>> list3 = getRepetition(list,list2);//取两者重复项，再到数据库中查找
+//		List<Map<String, Object>> list4 = new ArrayList<Map<String, Object>>();	
+//		
+//		for (Map<String, Object> map : list3) {//遍历list3  
+//			String sql4 = "select * from comment where mid  = ? and type = ? order by createTimeStamp";	
+//			list4.addAll(this.jdbcTemplate.queryForList(sql4, (Integer)map.get("mid"),(Integer)map.get("type")));
+//        }  
+//		
+//		return list4;
+//	}
+		public List<Map<String, Object>> getUnreadComment(String nowUid, Integer start, Integer count) {//未读的评论消息（指代）	
+			
+			String sql1;
+			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+			List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+			String tableName[]= {"question", "experienceshare", "rewardhelp", "schoolactivity", "secondarymarket"};
+			for (int i = 0; i < 5 ; i++) {
+				sql1 = "select id as mid,type from "+tableName[i]+" where uid  = ? order by createTimeStamp desc";	
+				list.addAll(this.jdbcTemplate.queryForList(sql1, nowUid));
+			}//获取用户发布的所有信息id与type
+			
+			String sql2 = "select * from comment where id = ? and type = ? and uid != ? order by createTimeStamp desc";
+			for (Map<String, Object> map : list) {
+				result.addAll(this.jdbcTemplate.queryForList(sql2, map.get("mid").toString(), map.get("type").toString(),nowUid));
+			}
+			
+			return result;
+		}
+
+
+		public int setUserInfo( String nowUid,String nickName,  String bio,String school, String wechat, String qq, Integer sex) {
+			String sql = "update user set nickName = ? , school = ? ,bio = ? , wechat = ? ,qq = ? ,sex = ?  where id = ?";
+			return this.jdbcTemplate.update(sql, nickName, school, bio, wechat, qq , sex, nowUid);
+		}
+
+
+
 	
 }
