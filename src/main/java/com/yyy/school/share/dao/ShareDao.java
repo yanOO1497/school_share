@@ -82,26 +82,26 @@ public class ShareDao {
 
 	public void setAgree(Integer type, Integer mid, String agreeStr) {
 		String tableName =this.getTableNameByType(type);
-		String sql = "update " + tableName + " set agreeList = ? and score = score + 1 where id = ?";
+		String sql = "update " + tableName + " set agreeList = ? , score = score + 1 where id = ?";
 		this.jdbcTemplate.update(sql, agreeStr, mid);
 	}
 	
 	public void setShare(Integer type, Integer mid, String shareArr) {
 		String tableName =this.getTableNameByType(type);
-		String sql = "update " + tableName + " set shareList = ? and score = score + 2 where id = ?";
+		String sql = "update " + tableName + " set shareList = ? , score = score + 2 where id = ?";
 		this.jdbcTemplate.update(sql, shareArr, mid);	
 	}
 	
 	public void setCollect(Integer type, Integer mid, String collectStr) {
 		String tableName = this.getTableNameByType(type);
-		String sql = "update " + tableName + " set collectList = ? and score = score + 2 where id = ?";
+		String sql = "update " + tableName + " set collectList = ? , score = score + 2 where id = ?";
 		this.jdbcTemplate.update(sql, collectStr, mid);
 		
 	}
 	
 	public void setReport(Integer type, Integer mid, String reportStr) {
 		String tableName = this.getTableNameByType(type);
-		String sql = "update " + tableName + " set reportList = ?  and score = score - 3  where id = ?";
+		String sql = "update " + tableName + " set reportList = ?  , score = score - 3  where id = ?";
 		this.jdbcTemplate.update(sql, reportStr, mid);
 		
 	}
@@ -203,8 +203,14 @@ public class ShareDao {
 	}
 	public List<Map<String, Object>> loadCollectList(Integer start, Integer count ,String nowUid) {
 		String sql = "select * from tableview WHERE collectList REGEXP '^"+nowUid+",|,"+nowUid+"$|,"+nowUid+",' order by createTimeStamp desc limit ?,?";	
-	return this.jdbcTemplate.queryForList(sql, start, count);
+		return this.jdbcTemplate.queryForList(sql, start, count);
 	}
+	
+	public List<Map<String, Object>> loadShareList(Integer start, Integer count, String nowUid) {
+		String sql = "select * from tableview WHERE shareList REGEXP '^"+nowUid+",|,"+nowUid+"$|,"+nowUid+",' order by createTimeStamp desc limit ?,?";	
+		return this.jdbcTemplate.queryForList(sql, start, count);
+	}
+	
 	public List<Map<String, Object>> loadTableListByUid(Integer start, Integer count,String uid) {
 		String sql = "select * from tableview  where uid = ? order by createTimeStamp desc limit ?,?";	
 		return this.jdbcTemplate.queryForList(sql,uid, start, count);
@@ -378,6 +384,21 @@ public class ShareDao {
 			String sql = "update user set nickName = ? , school = ? ,bio = ? , wechat = ? ,qq = ? ,sex = ?  where id = ?";
 			return this.jdbcTemplate.update(sql, nickName, school, bio, wechat, qq , sex, nowUid);
 		}
+
+
+		public int toggleShowQQ(String nowUid, Integer flag) {
+			String sql = "update user set showQQ = ? where id = ?";
+			return this.jdbcTemplate.update(sql, flag, nowUid);
+		}
+
+
+		public int toggleShowWechat(String nowUid, Integer flag) {
+			String sql = "update user set showWechat = ? where id = ?";
+			return this.jdbcTemplate.update(sql, flag, nowUid);
+		}
+
+
+
 
 
 

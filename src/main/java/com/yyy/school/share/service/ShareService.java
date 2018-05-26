@@ -32,7 +32,7 @@ public class ShareService {
 	
 	public static QiniuUtil qiniuUtil = new QiniuUtil();
 	
-	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	
 	public boolean sort(final List<Map<String, Object>> list, final String sort, final int sortType) {
 
@@ -147,7 +147,7 @@ public class ShareService {
 	}
 
 	public Object loadCollectList(Integer start, Integer count, String nowUid) {
-List<Map<String, Object>> list = this.shareDao.loadCollectList(start, count ,nowUid);
+		List<Map<String, Object>> list = this.shareDao.loadCollectList(start, count ,nowUid);
 		
 		list = this.getMoreListDetail(list, nowUid);
 		//举报次数超过20，不显示
@@ -158,6 +158,20 @@ List<Map<String, Object>> list = this.shareDao.loadCollectList(start, count ,now
 		}
 		return list;
 	}
+	
+	public Object loadShareList(Integer start, Integer count, String nowUid) {
+		List<Map<String, Object>> list = this.shareDao.loadShareList(start, count ,nowUid);
+		
+		list = this.getMoreListDetail(list, nowUid);
+		//举报次数超过20，不显示
+		for (int i = list.size()-1; i >= 0; i--){
+			if ((Integer)list.get(i).get("reportNum") >= 20){
+				list.remove(i);
+			}
+		}
+		return list;
+	}
+
 	public List<Map<String, Object>> loadTableListByUid(Integer start, Integer count, String uid) {
 		List<Map<String, Object>> list = this.shareDao.loadTableListByUid(start, count ,uid);
 		list = this.getMoreListDetail(list, uid);
@@ -596,6 +610,20 @@ List<Map<String, Object>> list = this.shareDao.loadCollectList(start, count ,now
 	public int setUserInfo(String nowUid, String nickName, String bio, String school, String qq, String wechat, Integer sex) {
 		return this.shareDao.setUserInfo( nowUid,nickName,bio,school, wechat,qq, sex);
 	}
+
+
+	public int toggleShowQQ(String nowUid, Integer flag) {
+		// TODO Auto-generated method stub
+		return this.shareDao.toggleShowQQ( nowUid,flag);
+	}
+
+
+	public int toggleShowWechat(String nowUid, Integer flag) {
+		// TODO Auto-generated method stub
+		return this.shareDao.toggleShowWechat( nowUid,flag);
+	}
+
+
 
 
 	

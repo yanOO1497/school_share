@@ -37,7 +37,7 @@ public class ShareController {
 	
 	@RequestMapping(value = "saveUserInfo.do")
 	public ResponseEntity<String> saveUserInfo(String uid, String nickName, String avatarUrl,  Integer sex){
-		System.out.println("saveUserInfo call");
+		System.out.println("saveUserInfo call"+"uid"+uid+"nickName:"+nickName+"avatarUrl:"+avatarUrl+"sex:"+sex);
 		
 		int i = this.shareService.saveUserInfo(uid, nickName, avatarUrl, sex);
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -172,6 +172,19 @@ public class ShareController {
 			return jsonEntity(result);
 	}
 	
+	@RequestMapping(value = "loadShareList.do")
+	public ResponseEntity<String> loadShareList(Integer start, Integer count,String nowUid){
+			System.out.println("loadShareList call");
+
+			Map<String, Object> result = new HashMap<String, Object>();
+			result.put("code", 100);
+			result.put("msg", "查询成功");
+			result.put("type", "question");
+			result.put("nowUid", nowUid);
+			result.put("subjects", this.shareService.loadShareList(start, count, nowUid));
+			return jsonEntity(result);
+	}
+	
 	@RequestMapping(value = "loadTableListByUid.do")//获取用户发布的信息列表
 	public ResponseEntity<String> loadTableListByUid(Integer start,  Integer count, String uid){
 			System.out.println("loadTableListByUid call");
@@ -251,6 +264,30 @@ public class ShareController {
 		result.put("code", 100);
 		result.put("msg", "修改成功");
 		result.put("result", this.shareService.setShare(uid, type, mid));
+		return jsonEntity(result);
+	}
+	
+
+
+	@RequestMapping(value = "toggleShowWechat.do")
+	public ResponseEntity<String> toggleShowWechat(String nowUid, Integer flag){
+		System.out.println(" toggleShowWechat call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "修改成功");
+		result.put("result", this.shareService.toggleShowWechat(nowUid , flag));
+		return jsonEntity(result);
+	}
+	
+	@RequestMapping(value = "toggleShowQQ.do")
+	public ResponseEntity<String> toggleShowQQ(String nowUid, Integer flag){
+		System.out.println(" toggleShowQQ call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "修改成功");
+		result.put("result", this.shareService.toggleShowQQ(nowUid , flag));
 		return jsonEntity(result);
 	}
 	
