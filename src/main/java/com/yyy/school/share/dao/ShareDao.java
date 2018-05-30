@@ -23,6 +23,9 @@ public class ShareDao {
 	public String getTableNameByType (Integer type) {
 		String tableName = "";
 		switch( type ){
+			case 0 :
+				tableName = "tableview";
+				break;
 			case 1:
 				tableName = "question";
 				break;
@@ -273,10 +276,10 @@ public class ShareDao {
 	public List<Map<String, Object>> getChatLogDetails(String nowUid,
 			String toUid, Integer start, Integer count) {
 		if(count == 0) {
-			String sql = "select * from chatLog where (uid = ? and toUid = ?) or (uid = ? and toUid = ?)  order by createTimeStamp ";
+			String sql = "select * from chatLog where (uid = ? and toUid = ?) or (uid = ? and toUid = ?)  order by createTimeStamp";
 			return this.jdbcTemplate.queryForList(sql, nowUid, toUid, toUid, nowUid);
 		}else {
-			String sql = "select * from chatLog where (uid = ? and toUid = ?) or (uid = ? and toUid = ?)  order by createTimeStamp limit ?,?";
+			String sql = "select * from chatLog where (uid = ? and toUid = ?) or (uid = ? and toUid = ?)  order by createTimeStamp  desc limit ?,?";
 			return this.jdbcTemplate.queryForList(sql, nowUid, toUid, toUid, nowUid, start, count);
 		}
 		
@@ -295,7 +298,6 @@ public class ShareDao {
 			String toUid = map.get("id").toString();
 			List<Map<String, Object>> listDetail = getChatLogDetails(nowUid, toUid,0,0);			
 			Map<String, Object> toUidMap = listDetail.get(listDetail.size()-1); //取与该用户最近的一条聊天记录。
-//			System.out.println(listDetail.size());
 			toUidMap.put("unreadNum", getUnreadByUid(nowUid, toUid));
 			subjects.add(toUidMap);
 		}
@@ -395,6 +397,14 @@ public class ShareDao {
 		public int toggleShowWechat(String nowUid, Integer flag) {
 			String sql = "update user set showWechat = ? where id = ?";
 			return this.jdbcTemplate.update(sql, flag, nowUid);
+		}
+
+
+		public String getDeleteImgUrl(Integer mid, Integer type) {
+		
+			String sql = "select picUrl from tableview where id = ? and type = ?";
+			List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql, mid, type);
+			return list.get(0).get("picUrl").toString();
 		}
 
 

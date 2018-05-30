@@ -326,6 +326,13 @@ public class ShareService {
 	}
 
 	public int deleteTableByMidAndType(Integer mid,Integer type ) {
+		String cancelStr = this.shareDao.getDeleteImgUrl(mid,type);
+		try {
+			qiniuUtil.delete(cancelStr);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return this.shareDao.deleteTableByMidAndType(mid,type );
 	}
 
@@ -440,7 +447,7 @@ public class ShareService {
 		
 		
 	}
-
+	
 	public Object getExperienceListByUid(Integer start, Integer count, String nowUid) {
 		List<Map<String, Object>> list = this.shareDao.getExperienceListByUid(start, count, nowUid);
 		list = this.getMoreListDetail(list, nowUid );

@@ -414,7 +414,7 @@ public class ShareController {
 		String fileName = type + "_" + uid + "_" + time + fileType;
 		File convFile = new File(filePath);
 		multipartFile.transferTo(convFile);
-		
+		System.out.println("uploadPic call" + filePath + " "+ fileName);
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 100);
 		result.put("msg", "图片上传成功");
