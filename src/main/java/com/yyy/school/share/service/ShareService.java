@@ -16,6 +16,10 @@ import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -23,12 +27,15 @@ import org.springframework.stereotype.Service;
 
 import com.yyy.school.share.dao.ShareDao;
 import com.yyy.school.share.util.QiniuUtil;
+import com.yyy.school.share.util.RequestDispatcherUtil;
 
 @Service
 public class ShareService {
 
 	@Autowired
 	private ShareDao shareDao;
+	
+	public static RequestDispatcherUtil requestDispatcherUtil = new RequestDispatcherUtil();
 	
 	public static QiniuUtil qiniuUtil = new QiniuUtil();
 	
@@ -632,12 +639,24 @@ public class ShareService {
 		return this.shareDao.toggleShowWechat( nowUid,flag);
 	}
 
-	public Object textbookSearch(String appid, String appsecret, Integer page, String key) {
+	public JSONObject textbookSearch(String appid, String appsecret, Integer page, String key) {
 		// TODO Auto-generated method stub
+//		String requsetUrl = "https://kaoshibb.com/api/v3/textbookSearch?appid=" + appid + "&appsecret=" + appsecret + "&page=" + page + "&key=" + key;
 		
-		
-		
-		return null;
+		String requsetUrl = "https://kaoshibb.com/api/v3/textbookSearch?appid=daxueyoudaan&appsecret=daxue20171101&page=1&key=";
+		String result = requestDispatcherUtil.getResponse(requsetUrl, "");
+		JSONObject jsonObject = null;
+		JSONArray jsonArray = null;
+		JSONObject jsonObject1 = null;
+		try {
+			jsonObject = new JSONObject(result);
+//			jsonArray = jsonObject.getJSONArray("data");
+			jsonObject1 = jsonObject.getJSONObject("data");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		System.out.println(result);
+		return jsonObject1;
 	}
 
 
