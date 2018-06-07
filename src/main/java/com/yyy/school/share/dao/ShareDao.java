@@ -83,9 +83,15 @@ public class ShareDao {
 		return this.jdbcTemplate.queryForList(sql, mid);
 	}
 
-	public void setAgree(Integer type, Integer mid, String agreeStr) {
+	public void setAgree(Integer type, Integer mid, String agreeStr, int newFlag) {
 		String tableName =this.getTableNameByType(type);
-		String sql = "update " + tableName + " set agreeList = ? , score = score + 1 where id = ?";
+		String sql;
+		if( newFlag == 0) {
+			sql = "update " + tableName + " set agreeList = ? , score = score - 1 where id = ?";
+		}else {
+			sql = "update " + tableName + " set agreeList = ? , score = score + 1 where id = ?";
+		}
+		
 		this.jdbcTemplate.update(sql, agreeStr, mid);
 	}
 	
@@ -95,9 +101,14 @@ public class ShareDao {
 		this.jdbcTemplate.update(sql, shareArr, mid);	
 	}
 	
-	public void setCollect(Integer type, Integer mid, String collectStr) {
+	public void setCollect(Integer type, Integer mid, String collectStr, int newFlag) {
 		String tableName = this.getTableNameByType(type);
-		String sql = "update " + tableName + " set collectList = ? , score = score + 2 where id = ?";
+		String sql;
+		if( newFlag == 0) {
+			sql = "update " + tableName + " set collectList = ? , score = score - 1 where id = ?";
+		}else {
+			sql = "update " + tableName + " set collectList = ? , score = score + 1 where id = ?";
+		}
 		this.jdbcTemplate.update(sql, collectStr, mid);
 		
 	}
@@ -106,7 +117,6 @@ public class ShareDao {
 		String tableName = this.getTableNameByType(type);
 		String sql = "update " + tableName + " set reportList = ?  , score = score - 3  where id = ?";
 		this.jdbcTemplate.update(sql, reportStr, mid);
-		
 	}
 
 	public int saveUserInfo(String uid, String nickName, String avatarUrl,  Integer sex) {
@@ -199,9 +209,15 @@ public class ShareDao {
 		return this.jdbcTemplate.queryForList(sql, nowUid, start, count);
 	}
 
-	public List<Map<String, Object>> loadTableList(Integer start, Integer count, Integer tableType) {
+	public List<Map<String, Object>> loadTableList(Integer start, Integer count, Integer tableType, String loadType) {
 		String tableName = this.getTableNameByType(tableType);
-			String sql = "select * from "+ tableName +" order by createTimeStamp desc limit ?,?";	
+		String sql ;
+		if(loadType.equals("0")) {
+			sql = "select * from "+ tableName +" order by createTimeStamp desc limit ?,?";	
+		}else {
+			sql = "select * from "+ tableName +" order by score desc limit ?,?";	
+		}
+		
 		return this.jdbcTemplate.queryForList(sql, start, count);
 	}
 	public List<Map<String, Object>> loadCollectList(Integer start, Integer count ,String nowUid) {

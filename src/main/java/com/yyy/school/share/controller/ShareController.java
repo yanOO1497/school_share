@@ -147,7 +147,7 @@ public class ShareController {
 //	}
 	
 	@RequestMapping(value = "loadTableList.do")
-	public ResponseEntity<String> loadTableList(Integer start, Integer tableType, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid){
+	public ResponseEntity<String> loadTableList(Integer start, Integer tableType, Integer count, @RequestParam(value = "nowUid", defaultValue = "0") String nowUid,@RequestParam(value = "loadType", defaultValue = "0") String loadType){
 			System.out.println("loadTableList call");
 
 			Map<String, Object> result = new HashMap<String, Object>();
@@ -155,7 +155,7 @@ public class ShareController {
 			result.put("msg", "查询成功");
 			result.put("type", "question");
 			result.put("nowUid", nowUid);
-			result.put("subjects", this.shareService.loadTableList(start, count, nowUid,tableType));
+			result.put("subjects", this.shareService.loadTableList(start, count, nowUid,tableType,loadType));
 			return jsonEntity(result);
 	}
 	
@@ -291,6 +291,7 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
+	
 	@RequestMapping(value = "setCollect.do")
 	public ResponseEntity<String> setCollect(String uid, Integer type, Integer mid, Integer collectFlag){
 		System.out.println("setCollect call");
@@ -301,6 +302,42 @@ public class ShareController {
 		result.put("result", this.shareService.setCollect(uid, type, mid, collectFlag));
 		return jsonEntity(result);
 	}
+	
+
+	@RequestMapping(value = "textbookSearch.do")
+	public ResponseEntity<String> textbookSearch(String appid, String appsecret, Integer page, String key){
+		System.out.println("textbookSearch call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "修改成功");
+		result.put("result", this.shareService.textbookSearch(appid, appsecret, page, key));
+		return jsonEntity(result);
+	}
+	
+	@RequestMapping(value = "textbookDetail.do")
+	public ResponseEntity<String> textbookDetail(String appid, String appsecret, String token,Integer id){
+		System.out.println("textbookDetail call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "修改成功");
+		result.put("result", this.shareService.textbookDetail(appid, appsecret,token, id));
+		return jsonEntity(result);
+	}
+	
+
+	@RequestMapping(value = "chapterDetail.do")
+	public ResponseEntity<String> chapterDetail(String appid, String appsecret, Integer id){
+		System.out.println("chapterDetail call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "请求成功");
+		result.put("result", this.shareService.chapterDetail(appid, appsecret, id));
+		return jsonEntity(result);
+	}
+	
 	
 	@RequestMapping(value = "setReport.do")
 	public ResponseEntity<String> setReport(String uid, Integer type, Integer mid){

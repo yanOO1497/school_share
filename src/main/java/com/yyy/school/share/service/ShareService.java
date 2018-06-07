@@ -133,8 +133,8 @@ public class ShareService {
 //		return list;
 //	}
 	
-	public List<Map<String, Object>> loadTableList(Integer start, Integer count, String nowUid,Integer tableType) {
-		List<Map<String, Object>> list = this.shareDao.loadTableList(start, count ,tableType);
+	public List<Map<String, Object>> loadTableList(Integer start, Integer count, String nowUid,Integer tableType, String loadType) {
+		List<Map<String, Object>> list = this.shareDao.loadTableList(start, count ,tableType,loadType);
 		
 		list = this.getMoreListDetail(list, nowUid);
 		//举报次数超过20，不显示
@@ -190,7 +190,7 @@ public class ShareService {
 
 	public Map<String, Object> setAgree(String uid, Integer type, Integer mid, Integer agreeFlag) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		int newFlag = agreeFlag == 0 ? 1 : 0;
+		int newFlag = agreeFlag == 0 ? 1 : 0;// 0 为无 1为点赞
 		List<Map<String, Object>> list = this.shareDao.getAgree(type, mid);
 		Object agree = list.get(0).get("agreeList");
 		String agreeStr = "";
@@ -213,7 +213,7 @@ public class ShareService {
 			}
 		}
 		agreeStr = agreeList.toString().replaceAll(" ", "").replaceAll("\\[", "").replaceAll("\\]", "");
-		this.shareDao.setAgree(type, mid, agreeStr);
+		this.shareDao.setAgree(type, mid, agreeStr,newFlag);
 		map.put("agreeNum", agreeList.size());
 		map.put("agreeFlag", newFlag);
 		return map;
@@ -265,7 +265,7 @@ public class ShareService {
 			}
 		}
 		collectStr = collectList.toString().replaceAll(" ", "").replaceAll("\\[", "").replaceAll("\\]", "");
-		this.shareDao.setCollect(type, mid, collectStr);
+		this.shareDao.setCollect(type, mid, collectStr,newFlag);
 		map.put("collectNum", collectList.size());
 		map.put("collectFlag", newFlag);
 		return map;
@@ -327,11 +327,13 @@ public class ShareService {
 
 	public int deleteTableByMidAndType(Integer mid,Integer type ) {
 		String cancelStr = this.shareDao.getDeleteImgUrl(mid,type);
-		try {
-			qiniuUtil.delete(cancelStr);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(!cancelStr.equals("")) {
+			try {
+				qiniuUtil.delete(cancelStr);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return this.shareDao.deleteTableByMidAndType(mid,type );
 	}
@@ -628,6 +630,26 @@ public class ShareService {
 	public int toggleShowWechat(String nowUid, Integer flag) {
 		// TODO Auto-generated method stub
 		return this.shareDao.toggleShowWechat( nowUid,flag);
+	}
+
+	public Object textbookSearch(String appid, String appsecret, Integer page, String key) {
+		// TODO Auto-generated method stub
+		
+		
+		
+		return null;
+	}
+
+
+	public Object textbookDetail(String appid, String appsecret, String token, Integer id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public Object chapterDetail(String appid, String appsecret, Integer id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

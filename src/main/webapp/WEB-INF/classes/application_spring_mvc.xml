@@ -45,6 +45,7 @@
 		<property name="maxActive" value="200" />
 		<property name="maxIdle" value="10" />
 		<property name="minIdle" value="5" />
+		<property name="connectionInitSqls" value="set names utf8mb4;"/>
 	</bean>
 
 	<bean id="multipartResolver"
