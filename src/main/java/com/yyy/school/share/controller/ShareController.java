@@ -305,39 +305,48 @@ public class ShareController {
 		return jsonEntity(result);
 	}
 	
+	@RequestMapping(value = "getOpenID.do")
+	public ResponseEntity<String> getOpenID(  String js_code){
+		System.out.println("getOpenID call");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "获取openID成功");
+		result.put("data", this.shareService.getOpenID(js_code));
+		return jsonEntity(result);
+	}
 
 	@RequestMapping(value = "textbookSearch.do")
-	@ResponseBody
-	public JSONObject textbookSearch(String appid, String appsecret, Integer page, String key){
+	public ResponseEntity<String> textbookSearch( Integer page, String key){
 		System.out.println("textbookSearch call");
-		return this.shareService.textbookSearch(appid, appsecret, page, key);
-//		Map<String, Object> result = new HashMap<String, Object>();
-//		result.put("code", 100);
-//		result.put("msg", "修改成功");
-//		result.put("result", this.shareService.textbookSearch(appid, appsecret, page, key));
-//		return jsonEntity(result);
-	}
-	
-	@RequestMapping(value = "textbookDetail.do")
-	public ResponseEntity<String> textbookDetail(String appid, String appsecret, String token,Integer id){
-		System.out.println("textbookDetail call");
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 100);
 		result.put("msg", "修改成功");
-		result.put("result", this.shareService.textbookDetail(appid, appsecret,token, id));
+		result.put("data", this.shareService.textbookSearch(page, key));
+		return jsonEntity(result);
+	}
+	
+	@RequestMapping(value = "textbookDetail.do")
+	public ResponseEntity<String> textbookDetail( String token,Integer id){
+		System.out.println("textbookDetail call");
+
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("code", 100);
+		result.put("msg", "修改成功");
+		result.put("data", this.shareService.textbookDetail(id));
 		return jsonEntity(result);
 	}
 	
 
 	@RequestMapping(value = "chapterDetail.do")
-	public ResponseEntity<String> chapterDetail(String appid, String appsecret, Integer id){
+	public ResponseEntity<String> chapterDetail( Integer id){
 		System.out.println("chapterDetail call");
-		
+
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 100);
-		result.put("msg", "请求成功");
-		result.put("result", this.shareService.chapterDetail(appid, appsecret, id));
+		result.put("msg", "修改成功");
+		result.put("data", this.shareService.chapterDetail(id));
 		return jsonEntity(result);
 	}
 	

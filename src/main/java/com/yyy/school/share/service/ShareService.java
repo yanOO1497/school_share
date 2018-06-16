@@ -638,37 +638,37 @@ public class ShareService {
 		// TODO Auto-generated method stub
 		return this.shareDao.toggleShowWechat( nowUid,flag);
 	}
-
-	public JSONObject textbookSearch(String appid, String appsecret, Integer page, String key) {
-		// TODO Auto-generated method stub
-//		String requsetUrl = "https://kaoshibb.com/api/v3/textbookSearch?appid=" + appid + "&appsecret=" + appsecret + "&page=" + page + "&key=" + key;
-		
-		String requsetUrl = "https://kaoshibb.com/api/v3/textbookSearch?appid=daxueyoudaan&appsecret=daxue20171101&page=1&key=";
+	
+	public String getOpenID( String js_code) {
+		String requsetUrl = "https://api.weixin.qq.com/sns/jscode2session?appid=wx15734a2373afa7a8&grant_type=authorization_code&secret=10c27dc6070ef03f708ccdbe3c072e21&js_code="+js_code;
+		System.out.println(requsetUrl);
 		String result = requestDispatcherUtil.getResponse(requsetUrl, "");
-		JSONObject jsonObject = null;
-		JSONArray jsonArray = null;
-		JSONObject jsonObject1 = null;
-		try {
-			jsonObject = new JSONObject(result);
-//			jsonArray = jsonObject.getJSONArray("data");
-			jsonObject1 = jsonObject.getJSONObject("data");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 		System.out.println(result);
-		return jsonObject1;
+		return result;
 	}
 
 
-	public Object textbookDetail(String appid, String appsecret, String token, Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+	public String textbookSearch( Integer page, String key) {
+		String requsetUrl = "https://kaoshibb.com/api/v3/textbookSearch?appid=daxueyoudaan&appsecret=daxue20171101&page="+page+"&key="+key;
+		String result = requestDispatcherUtil.getResponse(requsetUrl, "");
+//		System.out.println(result);
+		return result;
 	}
 
 
-	public Object chapterDetail(String appid, String appsecret, Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+	public String textbookDetail(Integer id) {
+		String requsetUrl = "https://kaoshibb.com/api/v3/textbookDetail?appid=daxueyoudaan&token=o-koh0VXtLtFp5K4DoF_tIIamts8&appsecret=daxue20171101&id="+id;
+		String result = requestDispatcherUtil.getResponse(requsetUrl, "");
+		System.out.println(result);
+		return result;
+	}
+
+
+	public String chapterDetail(Integer id) {
+		String requsetUrl = "https://kaoshibb.com/api/v3/chapterDetail?appid=daxueyoudaan&appsecret=daxue20171101&id="+id;
+		String result = requestDispatcherUtil.getResponse(requsetUrl, "");
+//		System.out.println(result);
+		return result;
 	}
 
 

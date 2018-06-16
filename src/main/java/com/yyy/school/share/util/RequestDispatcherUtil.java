@@ -15,13 +15,8 @@ public class RequestDispatcherUtil {
         try {
             URL url = new URL(requsetUrl);
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-//            httpConn.setDoOutput(true);
-//            httpConn.setDoInput(true);
             httpConn.setUseCaches(false);
             httpConn.setRequestMethod("GET");
-//            OutputStream outputStream = httpConn.getOutputStream();
-//            outputStream.write(content.getBytes("utf-8"));
-//            outputStream.close();
             BufferedReader responseReader = new BufferedReader(
                     new InputStreamReader(httpConn.getInputStream(), "utf-8"));
             String readLine;
